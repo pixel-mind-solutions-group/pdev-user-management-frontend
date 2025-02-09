@@ -10,19 +10,17 @@ import {
   CFormLabel,
   CFormFeedback,
   CRow,
-  CFormCheck,
+  CTableRow,
   CFormSelect,
-  CInputGroup,
-  CInputGroupText,
-  CTableHeaderCell,
-  CTableHead,
   CTable,
   CTableBody,
   CTableDataCell,
-  CTableRow,
+  CInputGroup,
+  CTableHeaderCell,
+  CTableHead,
 } from '@coreui/react'
 
-const User = () => {
+const ApplicationScope = () => {
   const [validated, setValidated] = useState(false)
   const handleSubmit = (event) => {
     const form = event.currentTarget
@@ -37,7 +35,7 @@ const User = () => {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Manage Users</strong>
+            <strong>Manage Application Scopes</strong>
           </CCardHeader>
           <CCardBody>
             <CForm
@@ -47,45 +45,22 @@ const User = () => {
               onSubmit={handleSubmit}
             >
               <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeInputName">First Name</CFormLabel>
-                <CFormInput id="specificSizeInputName" placeholder="First Name" required />
+                <CFormLabel htmlFor="specificSizeInputName">Scope</CFormLabel>
+                <CFormInput id="specificSizeInputName" placeholder="Scope" required />
                 <CFormFeedback tooltip invalid>
-                  Please provide a first name.
+                  Please provide a scope.
                 </CFormFeedback>
               </CCol>
               <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeInputGroupUsername">Last Name</CFormLabel>
+                <CFormLabel htmlFor="specificSizeInputGroupUsername">Unique ID</CFormLabel>
                 <CInputGroup>
                   <CFormInput
                     id="specificSizeInputGroupUsername"
-                    placeholder="Last Name"
-                    required
+                    placeholder="Unique ID"
+                    disabled
                   />
                   <CFormFeedback tooltip invalid>
-                    Please provide a last name.
-                  </CFormFeedback>
-                </CInputGroup>
-              </CCol>
-              <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeInputGroupUsername">User Name</CFormLabel>
-                <CInputGroup className="has-validation">
-                  <CInputGroupText>@</CInputGroupText>
-                  <CFormInput
-                    id="specificSizeInputGroupUsername"
-                    placeholder="User Name"
-                    required
-                  />
-                  <CFormFeedback tooltip invalid>
-                    Please provide a user name.
-                  </CFormFeedback>
-                </CInputGroup>
-              </CCol>
-              <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeInputGroupUsername">Email</CFormLabel>
-                <CInputGroup>
-                  <CFormInput id="specificSizeInputGroupUsername" placeholder="Email" required />
-                  <CFormFeedback tooltip invalid>
-                    Please provide an email.
+                    Please provide a unique id.
                   </CFormFeedback>
                 </CInputGroup>
               </CCol>
@@ -99,28 +74,6 @@ const User = () => {
                 <CFormFeedback tooltip invalid>
                   Please select a status.
                 </CFormFeedback>
-              </CCol>
-              <CCol sm={2}>
-                <CFormLabel htmlFor="specificSizeInputGroupUsername">Email verification</CFormLabel>
-                <CInputGroup>
-                  <CFormCheck
-                    type="checkbox"
-                    id="autoSizingCheck2"
-                    label="Verified"
-                    style={{ cursor: 'pointer' }}
-                  />
-                </CInputGroup>
-              </CCol>
-              <CCol sm={2}>
-                <CFormLabel htmlFor="specificSizeInputGroupUsername">Lock user account</CFormLabel>
-                <CInputGroup>
-                  <CFormCheck
-                    type="checkbox"
-                    id="autoSizingCheck2"
-                    label="Locked"
-                    style={{ cursor: 'pointer' }}
-                  />
-                </CInputGroup>
               </CCol>
               <CCol xs="auto" style={{ marginTop: '40px' }}>
                 <CButton color="primary" type="submit">
@@ -154,5 +107,4 @@ const User = () => {
     </CRow>
   )
 }
-
-export default User
+export default ApplicationScope

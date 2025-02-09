@@ -71,12 +71,12 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Authorize Party',
-        to: '/settings/auth-party',
+        to: '/permission/auth-party',
       },
       {
         component: CNavItem,
         name: 'Authorize Party Profile',
-        to: '/settings/auth-party-profile',
+        to: '/permission/auth-party-profile',
       },
     ],
   },
