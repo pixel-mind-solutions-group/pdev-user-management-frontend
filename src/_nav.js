@@ -75,6 +75,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Authorize Party Role',
+        to: '/permission/auth-party-role',
+      },
+      {
+        component: CNavItem,
         name: 'Authorize Party Profile',
         to: '/permission/auth-party-profile',
       },

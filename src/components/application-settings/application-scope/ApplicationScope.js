@@ -28,6 +28,15 @@ const ApplicationScope = () => {
       event.preventDefault()
       event.stopPropagation()
     }
+
+    const selects = form.querySelectorAll('select')
+    selects.forEach((select) => {
+      if (select.value === '-1') {
+        select.setCustomValidity('Please select an option.')
+      } else {
+        select.setCustomValidity('')
+      }
+    })
     setValidated(true)
   }
   return (
@@ -88,7 +97,6 @@ const ApplicationScope = () => {
         <CTable>
           <CTableHead color="dark">
             <CTableRow>
-              <CTableHeaderCell scope="col">#</CTableHeaderCell>
               <CTableHeaderCell scope="col">Scope</CTableHeaderCell>
               <CTableHeaderCell scope="col">Unique ID</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
@@ -96,7 +104,6 @@ const ApplicationScope = () => {
           </CTableHead>
           <CTableBody>
             <CTableRow>
-              <CTableHeaderCell scope="row">1</CTableHeaderCell>
               <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>Otto</CTableDataCell>
               <CTableDataCell>@mdo</CTableDataCell>

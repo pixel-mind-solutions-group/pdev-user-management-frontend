@@ -15,7 +15,6 @@ import {
   CTable,
   CTableBody,
   CTableDataCell,
-  CInputGroup,
   CTableHeaderCell,
   CTableHead,
 } from '@coreui/react'
@@ -28,6 +27,15 @@ const Module = () => {
       event.preventDefault()
       event.stopPropagation()
     }
+
+    const selects = form.querySelectorAll('select')
+    selects.forEach((select) => {
+      if (select.value === '-1') {
+        select.setCustomValidity('Please select an option.')
+      } else {
+        select.setCustomValidity('')
+      }
+    })
     setValidated(true)
   }
   return (
@@ -84,7 +92,6 @@ const Module = () => {
         <CTable>
           <CTableHead color="dark">
             <CTableRow>
-              <CTableHeaderCell scope="col">#</CTableHeaderCell>
               <CTableHeaderCell scope="col">Name</CTableHeaderCell>
               <CTableHeaderCell scope="col">Application Scope</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
@@ -92,7 +99,6 @@ const Module = () => {
           </CTableHead>
           <CTableBody>
             <CTableRow>
-              <CTableHeaderCell scope="row">1</CTableHeaderCell>
               <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>Otto</CTableDataCell>
               <CTableDataCell>@mdo</CTableDataCell>

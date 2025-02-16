@@ -7,6 +7,8 @@ import {
     CCol,
     CForm,
     CFormInput,
+    CInputGroup,
+    CFormCheck,
     CFormLabel,
     CFormFeedback,
     CRow,
@@ -19,7 +21,7 @@ import {
     CTableHead,
 } from '@coreui/react'
 
-function ComponentElement() {
+function AuthPartyRole() {
     const [validated, setValidated] = useState(false)
     const handleSubmit = (event) => {
         const form = event.currentTarget
@@ -35,7 +37,7 @@ function ComponentElement() {
             } else {
                 select.setCustomValidity('')
             }
-        });
+        })
         setValidated(true)
     }
     return (
@@ -43,7 +45,7 @@ function ComponentElement() {
             <CCol xs={12}>
                 <CCard className="mb-4">
                     <CCardHeader>
-                        <strong>Manage Component Elements</strong>
+                        <strong>Manage Authorize Party Roles</strong>
                     </CCardHeader>
                     <CCardBody>
                         <CForm
@@ -53,33 +55,10 @@ function ComponentElement() {
                             onSubmit={handleSubmit}
                         >
                             <CCol sm={4}>
-                                <CFormLabel htmlFor="specificSizeInputName">Name</CFormLabel>
-                                <CFormInput id="specificSizeInputName" placeholder="Name" required />
+                                <CFormLabel htmlFor="specificSizeInputName">Role</CFormLabel>
+                                <CFormInput id="specificSizeInputName" placeholder="Role" required />
                                 <CFormFeedback tooltip invalid>
-                                    Please provide a name.
-                                </CFormFeedback>
-                            </CCol>
-                            <CCol sm={4}>
-                                <CFormLabel htmlFor="specificSizeInputName">Key Name</CFormLabel>
-                                <CFormInput id="specificSizeInputName" placeholder="Key name" required />
-                                <CFormFeedback tooltip invalid>
-                                    Please provide a key name.
-                                </CFormFeedback>
-                            </CCol>
-                            <CCol sm={4}>
-                                <CFormLabel htmlFor="specificSizeInputName">Element Name</CFormLabel>
-                                <CFormInput id="specificSizeInputName" placeholder="Element name" required />
-                                <CFormFeedback tooltip invalid>
-                                    Please provide an element name.
-                                </CFormFeedback>
-                            </CCol>
-                            <CCol sm={4}>
-                                <CFormLabel htmlFor="specificSizeSelect">Component</CFormLabel>
-                                <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
-                                    <option value="-1">Select a component</option>
-                                </CFormSelect>
-                                <CFormFeedback tooltip invalid>
-                                    Please select a component.
+                                    Please provide a role.
                                 </CFormFeedback>
                             </CCol>
                             <CCol sm={4}>
@@ -106,20 +85,14 @@ function ComponentElement() {
                 <CTable>
                     <CTableHead color="dark">
                         <CTableRow>
-                            <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-                            <CTableHeaderCell scope="col">Key Name</CTableHeaderCell>
-                            <CTableHeaderCell scope="col">Element Name</CTableHeaderCell>
-                            <CTableHeaderCell scope="col">Component</CTableHeaderCell>
+                            <CTableHeaderCell scope="col">Role</CTableHeaderCell>
                             <CTableHeaderCell scope="col">Status</CTableHeaderCell>
                         </CTableRow>
                     </CTableHead>
                     <CTableBody>
                         <CTableRow>
                             <CTableDataCell>Mark</CTableDataCell>
-                            <CTableDataCell>Mark</CTableDataCell>
-                            <CTableDataCell>Mark</CTableDataCell>
-                            <CTableDataCell>Otto</CTableDataCell>
-                            <CTableDataCell>@mdo</CTableDataCell>
+                            <CTableDataCell>@mdo, @mdo , @mdo, @mdo</CTableDataCell>
                         </CTableRow>
                     </CTableBody>
                 </CTable>
@@ -128,4 +101,4 @@ function ComponentElement() {
     )
 }
 
-export default ComponentElement;
+export default AuthPartyRole
