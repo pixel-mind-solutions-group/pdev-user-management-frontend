@@ -71,7 +71,8 @@ function AuthPartyProfile() {
                                         id="autoSizingCheck2"
                                         label="Verified"
                                         style={{ cursor: 'pointer' }}
-                                    /> &nbsp;&nbsp;
+                                    />{' '}
+                                    &nbsp;&nbsp;
                                     <CFormCheck
                                         type="checkbox"
                                         id="autoSizingCheck2"

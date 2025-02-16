@@ -90,6 +90,20 @@ const User = () => {
                 </CInputGroup>
               </CCol>
               <CCol sm={4}>
+                <CFormLabel htmlFor="specificSizeInputGroupUsername">Password</CFormLabel>
+                <CInputGroup>
+                  <CFormInput
+                    type="password"
+                    id="specificSizeInputGroupUsername"
+                    placeholder="Password"
+                    required
+                  />
+                  <CFormFeedback tooltip invalid>
+                    Please provide a password.
+                  </CFormFeedback>
+                </CInputGroup>
+              </CCol>
+              <CCol sm={4}>
                 <CFormLabel htmlFor="specificSizeInputGroupUsername">Email</CFormLabel>
                 <CInputGroup>
                   <CFormInput id="specificSizeInputGroupUsername" placeholder="Email" required />
@@ -131,7 +145,113 @@ const User = () => {
                   />
                 </CInputGroup>
               </CCol>
-              <CCol xs="auto" style={{ marginTop: '40px' }}>
+              <br />
+              <br />
+              <br />
+              <br />
+              <CCol xs={12}>
+                <CCard className="mb-4">
+                  <CCardHeader>
+                    <span>Authorize Parties</span>
+                  </CCardHeader>
+                  <CCardBody>
+                    <CCol sm={6}>
+                      <CInputGroup>
+                        <CFormCheck
+                          type="checkbox"
+                          id="autoSizingCheck2"
+                          label="Verified"
+                          style={{ cursor: 'pointer' }}
+                        />{' '}
+                        &nbsp;&nbsp;
+                        <CFormCheck
+                          type="checkbox"
+                          id="autoSizingCheck2"
+                          label="Verified"
+                          style={{ cursor: 'pointer' }}
+                        />
+                      </CInputGroup>
+                    </CCol>
+                  </CCardBody>
+                </CCard>
+              </CCol>
+              <br />
+              <br />
+              <br />
+              <br />
+              <CCol xs={12}>
+                <CCard className="mb-4">
+                  <CCardHeader>
+                    <span>Application & Roles</span>
+                  </CCardHeader>
+                  <CCardBody>
+                    <div
+                      className="row gx-3 gy-2 align-items-center"
+                      noValidate
+                      validated={validated}
+                      onSubmit={handleSubmit}
+                    >
+                      <CCol sm={4}>
+                        <CFormLabel htmlFor="specificSizeSelect">Application Scope</CFormLabel>
+                        <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
+                          <option value="-1">Select an application scope</option>
+                        </CFormSelect>
+                        <CFormFeedback tooltip invalid>
+                          Please select an application scope.
+                        </CFormFeedback>
+                      </CCol>
+                      <CCol sm={4}>
+                        <CFormLabel htmlFor="specificSizeSelect">User Role</CFormLabel>
+                        <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
+                          <option value="-1">Select a user role</option>
+                        </CFormSelect>
+                        <CFormFeedback tooltip invalid>
+                          Please select a user role.
+                        </CFormFeedback>
+                      </CCol>
+                      <CCol sm={4}>
+                        <CCol xs="auto" style={{ marginTop: '40px' }}>
+                          <CButton type="button" class="btn btn-success btn-sm">
+                            <strong style={{ color: 'white' }}>+</strong>
+                          </CButton>
+                        </CCol>
+                      </CCol>
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                      <CCol xs={12}>
+                        <CTable>
+                          <CTableHead color="dark">
+                            <CTableRow>
+                              <CTableHeaderCell scope="col">Scope</CTableHeaderCell>
+                              <CTableHeaderCell scope="col">Role</CTableHeaderCell>
+                              <CTableHeaderCell scope="col">Action</CTableHeaderCell>
+                            </CTableRow>
+                          </CTableHead>
+                          <CTableBody>
+                            <CTableRow>
+                              <CTableDataCell>Mark</CTableDataCell>
+                              <CTableDataCell>Otto</CTableDataCell>
+                              <CTableDataCell>
+                                <a
+                                  href="#"
+                                  class="btn btn-danger btn-sm"
+                                  style={{ color: 'white' }}
+                                >
+                                  Remove
+                                </a>
+                              </CTableDataCell>
+                            </CTableRow>
+                          </CTableBody>
+                        </CTable>
+                      </CCol>
+                    </div>
+                  </CCardBody>
+                </CCard>
+              </CCol>
+              <CCol xs={11} />
+              <CCol xs="auto">
                 <CButton color="primary" type="submit">
                   Create
                 </CButton>
@@ -144,15 +264,25 @@ const User = () => {
         <CTable>
           <CTableHead color="dark">
             <CTableRow>
-              <CTableHeaderCell scope="col">Scope</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Unique ID</CTableHeaderCell>
+              <CTableHeaderCell scope="col">First name</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Last name</CTableHeaderCell>
+              <CTableHeaderCell scope="col">User name</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Email</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Email verify</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Locked</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Action</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
             <CTableRow>
               <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>Otto</CTableDataCell>
+              <CTableDataCell>@mdo</CTableDataCell>
+              <CTableDataCell>Mark</CTableDataCell>
+              <CTableDataCell>Otto</CTableDataCell>
+              <CTableDataCell>@mdo</CTableDataCell>
+              <CTableDataCell>@mdo</CTableDataCell>
               <CTableDataCell>@mdo</CTableDataCell>
             </CTableRow>
           </CTableBody>
