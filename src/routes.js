@@ -4,6 +4,8 @@ import ComponentElement from './components/application-settings/component-elemen
 import AuthParty from './components/permission/auth-party/AuthParty'
 import AuthPartyProfile from './components/permission/auth-party-profile/AuthPartyProfile'
 import AuthPartyRole from './components/permission/auth-party-role/AuthPartyRole'
+import UserRole from './components/user-role/UserRole'
+import AccessControl from './components/application-settings/access-control/AccessControl'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 
@@ -22,11 +24,14 @@ const routes = [
   { path: '/application/component-element', name: 'Component', element: ComponentElement },
   { path: '/application/module', name: 'Module', element: Module },
   { path: '/permission/auth-party', name: 'Authorize Party', element: AuthParty },
+  { path: '/settings/user-role', name: 'User Role', element: UserRole },
+  { path: '/settings/access-control', name: 'Access Control', element: AccessControl },
   {
     path: '/permission/auth-party-profile',
     name: 'Authorize Party Profile',
     element: AuthPartyProfile,
-  }, {
+  },
+  {
     path: '/permission/auth-party-role',
     name: 'Authorize Party Role',
     element: AuthPartyRole,

@@ -6,6 +6,7 @@ import {
   cilFingerprint,
   cilSpeedometer,
   cilApplicationsSettings,
+  cibOpenAccess,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -29,6 +30,12 @@ const _nav = [
     name: 'User',
     to: '/main/user',
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'User Role',
+    to: '/settings/user-role',
+    icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
@@ -87,9 +94,9 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'User Role',
-    to: '/settings/user-role',
-    icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
+    name: 'Access Control',
+    to: '/settings/access-control',
+    icon: <CIcon icon={cibOpenAccess} customClassName="nav-icon" />,
   },
 ]
 
