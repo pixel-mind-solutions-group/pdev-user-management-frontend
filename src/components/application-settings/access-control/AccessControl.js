@@ -6,7 +6,10 @@ import {
     CCardHeader,
     CCol,
     CForm,
-    CAccordion, CAccordionBody, CAccordionHeader, CAccordionItem,
+    CAccordion,
+    CAccordionBody,
+    CAccordionHeader,
+    CAccordionItem,
     CFormLabel,
     CFormFeedback,
     CRow,
@@ -17,7 +20,8 @@ import {
     CTable,
     CTableBody,
     CTableDataCell,
-    CTableRow, CInputGroup
+    CTableRow,
+    CInputGroup,
 } from '@coreui/react'
 
 function AccessControl() {
@@ -76,13 +80,11 @@ function AccessControl() {
                 </CCard>
             </CCol>
             <CCol xs={12}>
-                <CCard className="mb-4" style={{ padding: "1em" }}>
-
+                <CCard className="mb-4" style={{ padding: '1em' }}>
                     <CAccordion alwaysOpen activeItemKey={1}>
                         <CAccordionItem itemKey={1}>
                             <CAccordionHeader>Modules</CAccordionHeader>
                             <CAccordionBody>
-
                                 <CCol sm={6}>
                                     <CInputGroup>
                                         <CFormCheck
@@ -94,53 +96,52 @@ function AccessControl() {
                                         &nbsp;&nbsp;&nbsp;
                                     </CInputGroup>
                                 </CCol>
-
                             </CAccordionBody>
                         </CAccordionItem>
                         <CAccordionItem itemKey={2}>
                             <CAccordionHeader>Components</CAccordionHeader>
                             <CAccordionBody>
-
                                 <CCard className="mb-4">
                                     <CCardHeader>
                                         <span>Job Position Module</span>
                                     </CCardHeader>
-                                    <CCardBody><CCol sm={6}>
-                                        <CInputGroup>
-                                            <CFormCheck
-                                                type="checkbox"
-                                                id="autoSizingCheck2"
-                                                label="checkbox2"
-                                                style={{ cursor: 'pointer' }}
-                                            />{' '}
-                                            &nbsp;&nbsp;&nbsp;
-                                        </CInputGroup>
-                                    </CCol></CCardBody>
+                                    <CCardBody>
+                                        <CCol sm={6}>
+                                            <CInputGroup>
+                                                <CFormCheck
+                                                    type="checkbox"
+                                                    id="autoSizingCheck2"
+                                                    label="checkbox2"
+                                                    style={{ cursor: 'pointer' }}
+                                                />{' '}
+                                                &nbsp;&nbsp;&nbsp;
+                                            </CInputGroup>
+                                        </CCol>
+                                    </CCardBody>
                                 </CCard>
-
                             </CAccordionBody>
                         </CAccordionItem>
                         <CAccordionItem itemKey={3}>
                             <CAccordionHeader>Component Elements</CAccordionHeader>
                             <CAccordionBody>
-
                                 <CCard className="mb-4">
                                     <CCardHeader>
                                         <span>Job Position Component</span>
                                     </CCardHeader>
-                                    <CCardBody><CCol sm={6}>
-                                        <CInputGroup>
-                                            <CFormCheck
-                                                type="checkbox"
-                                                id="autoSizingCheck2"
-                                                label="checkbox2"
-                                                style={{ cursor: 'pointer' }}
-                                            />{' '}
-                                            &nbsp;&nbsp;&nbsp;
-                                        </CInputGroup>
-                                    </CCol></CCardBody>
+                                    <CCardBody>
+                                        <CCol sm={6}>
+                                            <CInputGroup>
+                                                <CFormCheck
+                                                    type="checkbox"
+                                                    id="autoSizingCheck2"
+                                                    label="checkbox2"
+                                                    style={{ cursor: 'pointer' }}
+                                                />{' '}
+                                                &nbsp;&nbsp;&nbsp;
+                                            </CInputGroup>
+                                        </CCol>
+                                    </CCardBody>
                                 </CCard>
-
                             </CAccordionBody>
                         </CAccordionItem>
                     </CAccordion>

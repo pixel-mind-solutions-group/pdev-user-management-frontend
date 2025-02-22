@@ -24,9 +24,14 @@ const Module = () => {
 
   const [formFields, setFormFields] = useState([{ id: 1 }])
 
+  const [addedFieldId, setAddedFieldId] = useState(1)
+
   const handleAddFields = () => {
     setFormFields([...formFields, { id: Date.now() }])
-    console.log(formFields)
+  }
+
+  const handleRemoveFields = (id) => {
+    setFormFields(formFields.filter((field) => field.id !== id))
   }
 
   const handleSubmit = (event) => {
@@ -72,10 +77,18 @@ const Module = () => {
 
               <div className="w-100"></div>
 
+              <React.Fragment>
+                <CCol sm={7}>
+                  <CFormLabel>Module Name</CFormLabel>
+                </CCol>
+                <CCol sm={3}>
+                  <CFormLabel>Status</CFormLabel>
+                </CCol>
+              </React.Fragment>
+
               {formFields.map((field) => (
                 <React.Fragment key={field.id}>
                   <CCol sm={7}>
-                    <CFormLabel htmlFor={`specificSizeInputName-${field.id}`}>Name</CFormLabel>
                     <CFormInput
                       id={`specificSizeInputName-${field.id}`}
                       placeholder="Name"
@@ -86,7 +99,6 @@ const Module = () => {
                     </CFormFeedback>
                   </CCol>
                   <CCol sm={3}>
-                    <CFormLabel htmlFor={`specificSizeSelect-${field.id}`}>Status</CFormLabel>
                     <CFormSelect
                       id={`specificSizeSelect-${field.id}`}
                       style={{ cursor: 'pointer' }}
@@ -100,27 +112,40 @@ const Module = () => {
                       Please select a status.
                     </CFormFeedback>
                   </CCol>
+                  <CCol sm={1}>
+                    <CCol xs="auto" style={{ marginTop: '0px' }}>
+                      <CButton
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleRemoveFields(field.id)}
+                      >
+                        <strong style={{ color: 'white' }}>-</strong>
+                      </CButton>
+                    </CCol>
+                  </CCol>
                 </React.Fragment>
               ))}
 
-              <CCol sm={2}>
-                <CCol xs="auto" style={{ marginTop: '32px' }}>
+              <CCol sm={1}>
+                <CCol xs="auto" style={{ marginTop: '0px' }}>
                   <CButton
                     type="button"
                     className="btn btn-success btn-sm"
                     onClick={handleAddFields}
                   >
                     <strong style={{ color: 'white' }}>+</strong>
-                  </CButton>
+                  </CButton>{' '}
                 </CCol>
               </CCol>
 
               <div className="w-100"></div>
-              <CCol xs="auto" style={{ marginTop: '40px' }}>
-                <CButton color="primary" type="submit">
-                  Create
-                </CButton>
-              </CCol>
+              <CRow className="justify-content-end">
+                <CCol xs="auto" style={{ marginTop: '30px' }}>
+                  <CButton color="primary" type="submit">
+                    Create
+                  </CButton>
+                </CCol>
+              </CRow>
             </CForm>
           </CCardBody>
         </CCard>
