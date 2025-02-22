@@ -54,7 +54,7 @@ const Module = () => {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Manage Modules</strong>
+            <strong>Manage Module</strong>
           </CCardHeader>
           <CCardBody>
             <CForm

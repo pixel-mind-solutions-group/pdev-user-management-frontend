@@ -44,7 +44,7 @@ const ApplicationScope = () => {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Manage Application Scopes</strong>
+            <strong>Manage Application Scope</strong>
           </CCardHeader>
           <CCardBody>
             <CForm
