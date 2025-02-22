@@ -175,7 +175,7 @@ const Module = () => {
           </CTableHead>
           <CTableBody>
             <CTableRow>
-            <CTableDataCell>Otto</CTableDataCell>
+              <CTableDataCell>Otto</CTableDataCell>
               <CTableDataCell>Otto</CTableDataCell>
               <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>@mdo</CTableDataCell>
