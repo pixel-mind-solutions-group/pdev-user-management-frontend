@@ -76,24 +76,38 @@ const Module = () => {
               <div className="w-100"></div>
 
               <React.Fragment>
-                <CCol sm={7}>
+                <CCol sm={3}>
+                  <CFormLabel>Key Name</CFormLabel>
+                </CCol>
+                <CCol sm={3}>
                   <CFormLabel>Module Name</CFormLabel>
                 </CCol>
                 <CCol sm={3}>
                   <CFormLabel>Status</CFormLabel>
                 </CCol>
+                <CCol sm={1}></CCol>
               </React.Fragment>
 
               {formFields.map((field) => (
                 <React.Fragment key={field.id}>
-                  <CCol sm={7}>
+                  <CCol sm={3}>
                     <CFormInput
                       id={`specificSizeInputName-${field.id}`}
-                      placeholder="Name"
+                      placeholder="Key name"
                       required
                     />
                     <CFormFeedback tooltip invalid>
-                      Please provide a name.
+                      Please provide a key name.
+                    </CFormFeedback>
+                  </CCol>
+                  <CCol sm={3}>
+                    <CFormInput
+                      id={`specificSizeInputName-${field.id}`}
+                      placeholder="Module name"
+                      required
+                    />
+                    <CFormFeedback tooltip invalid>
+                      Please provide a module name.
                     </CFormFeedback>
                   </CCol>
                   <CCol sm={3}>
@@ -153,13 +167,15 @@ const Module = () => {
           <CTableHead color="dark">
             <CTableRow>
               <CTableHeaderCell scope="col">Application Scope</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Module Name</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Key</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Module</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
               <CTableHeaderCell scope="col">Action</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
             <CTableRow>
+            <CTableDataCell>Otto</CTableDataCell>
               <CTableDataCell>Otto</CTableDataCell>
               <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>@mdo</CTableDataCell>

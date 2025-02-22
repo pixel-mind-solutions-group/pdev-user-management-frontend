@@ -21,6 +21,16 @@ import {
 
 function ComponentElement() {
     const [validated, setValidated] = useState(false)
+    const [formFields, setFormFields] = useState([{ id: 1 }])
+
+    const handleFormFields = () => {
+        setFormFields([...formFields, { id: Date.now() }])
+    }
+
+    const handleRemoveFields = (id) => {
+        setFormFields(formFields.filter((field) => field.id !== id))
+    }
+
     const handleSubmit = (event) => {
         const form = event.currentTarget
         if (form.checkValidity() === false) {
@@ -35,7 +45,7 @@ function ComponentElement() {
             } else {
                 select.setCustomValidity('')
             }
-        });
+        })
         setValidated(true)
     }
     return (
@@ -52,52 +62,107 @@ function ComponentElement() {
                             validated={validated}
                             onSubmit={handleSubmit}
                         >
+
                             <CCol sm={4}>
-                                <CFormLabel htmlFor="specificSizeInputName">Name</CFormLabel>
-                                <CFormInput id="specificSizeInputName" placeholder="Name" required />
+                                <CFormLabel>Application Scope</CFormLabel>
+                                <CFormSelect style={{ cursor: 'pointer' }} required>
+                                    <option value="-1">Select an application scope</option>
+                                </CFormSelect>
                                 <CFormFeedback tooltip invalid>
-                                    Please provide a name.
+                                    Please select an application scope.
                                 </CFormFeedback>
                             </CCol>
                             <CCol sm={4}>
-                                <CFormLabel htmlFor="specificSizeInputName">Key Name</CFormLabel>
-                                <CFormInput id="specificSizeInputName" placeholder="Key name" required />
+                                <CFormLabel>Module</CFormLabel>
+                                <CFormSelect style={{ cursor: 'pointer' }} required>
+                                    <option value="-1">Select a module</option>
+                                </CFormSelect>
                                 <CFormFeedback tooltip invalid>
-                                    Please provide a key name.
+                                    Please select a module.
                                 </CFormFeedback>
                             </CCol>
                             <CCol sm={4}>
-                                <CFormLabel htmlFor="specificSizeInputName">Element Name</CFormLabel>
-                                <CFormInput id="specificSizeInputName" placeholder="Element name" required />
-                                <CFormFeedback tooltip invalid>
-                                    Please provide an element name.
-                                </CFormFeedback>
-                            </CCol>
-                            <CCol sm={4}>
-                                <CFormLabel htmlFor="specificSizeSelect">Component</CFormLabel>
-                                <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
+                                <CFormLabel>Component</CFormLabel>
+                                <CFormSelect style={{ cursor: 'pointer' }} required>
                                     <option value="-1">Select a component</option>
                                 </CFormSelect>
                                 <CFormFeedback tooltip invalid>
                                     Please select a component.
                                 </CFormFeedback>
                             </CCol>
-                            <CCol sm={4}>
-                                <CFormLabel htmlFor="specificSizeSelect">Status</CFormLabel>
-                                <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
-                                    <option value="-1">Select a status</option>
-                                    <option value="ACTIVE">Active</option>
-                                    <option value="IN-ACTIVE">In-active</option>
-                                </CFormSelect>
-                                <CFormFeedback tooltip invalid>
-                                    Please select a status.
-                                </CFormFeedback>
+
+
+                            <div className="w-100"></div>
+
+                            <CCol sm={3}>
+                                <CFormLabel>Key Name</CFormLabel>
                             </CCol>
-                            <CCol xs="auto" style={{ marginTop: '40px' }}>
-                                <CButton color="primary" type="submit">
-                                    Create
-                                </CButton>
+                            <CCol sm={3}>
+                                <CFormLabel>Element Name</CFormLabel>
                             </CCol>
+                            <CCol sm={3}>
+                                <CFormLabel>Status</CFormLabel>
+                            </CCol>
+                            <CCol sm={1}>
+                            </CCol>
+
+                            {formFields.map((field) => (
+                                <React.Fragment key={field.id}>
+                                    <CCol sm={3}>
+                                        <CFormInput id="specificSizeInputName" placeholder="Key name" required />
+                                        <CFormFeedback tooltip invalid>
+                                            Please provide a key name.
+                                        </CFormFeedback>
+                                    </CCol>
+                                    <CCol sm={3}>
+                                        <CFormInput id="specificSizeInputName" placeholder="Element Name" required />
+                                        <CFormFeedback tooltip invalid>
+                                            Please provide a name.
+                                        </CFormFeedback>
+                                    </CCol>
+
+                                    <CCol sm={3}>
+                                        <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
+                                            <option value="-1">Select a status</option>
+                                            <option value="ACTIVE">Active</option>
+                                            <option value="IN-ACTIVE">In-active</option>
+                                        </CFormSelect>
+                                        <CFormFeedback tooltip invalid>
+                                            Please select a status.
+                                        </CFormFeedback>
+                                    </CCol>
+                                    <CCol sm={1}>
+                                        <CCol xs="auto" style={{ marginTop: '0px' }}>
+                                            <CButton
+                                                type="button"
+                                                className="btn btn-danger btn-sm"
+                                                onClick={() => { handleRemoveFields(field.id) }}>
+                                                <strong style={{ color: 'white' }}>-</strong>
+                                            </CButton>
+                                        </CCol>
+                                    </CCol>
+                                </React.Fragment>
+                            ))}
+
+                            <CCol sm={1}>
+                                <CCol xs="auto" style={{ marginTop: '0px' }}>
+                                    <CButton
+                                        type="button"
+                                        className="btn btn-success btn-sm"
+                                        onClick={handleFormFields}>
+                                        <strong style={{ color: 'white' }}>+</strong>
+                                    </CButton>
+                                </CCol>
+                            </CCol>
+
+                            <div className="w-100"></div>
+                            <CRow className="justify-content-end">
+                                <CCol xs="auto" style={{ marginTop: '30px' }}>
+                                    <CButton color="primary" type="submit">
+                                        Create
+                                    </CButton>
+                                </CCol>
+                            </CRow>
                         </CForm>
                     </CCardBody>
                 </CCard>
@@ -106,11 +171,13 @@ function ComponentElement() {
                 <CTable>
                     <CTableHead color="dark">
                         <CTableRow>
-                            <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-                            <CTableHeaderCell scope="col">Key Name</CTableHeaderCell>
-                            <CTableHeaderCell scope="col">Element Name</CTableHeaderCell>
+                            <CTableHeaderCell scope="col">Application Scope</CTableHeaderCell>
+                            <CTableHeaderCell scope="col">Module</CTableHeaderCell>
                             <CTableHeaderCell scope="col">Component</CTableHeaderCell>
+                            <CTableHeaderCell scope="col">Key</CTableHeaderCell>
+                            <CTableHeaderCell scope="col">Element</CTableHeaderCell>
                             <CTableHeaderCell scope="col">Status</CTableHeaderCell>
+                            <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                         </CTableRow>
                     </CTableHead>
                     <CTableBody>
@@ -120,6 +187,16 @@ function ComponentElement() {
                             <CTableDataCell>Mark</CTableDataCell>
                             <CTableDataCell>Otto</CTableDataCell>
                             <CTableDataCell>@mdo</CTableDataCell>
+                            <CTableDataCell>Mark</CTableDataCell>
+                            <CTableDataCell>
+                                <CButton type="button" className="btn btn-primary btn-sm">
+                                    <span style={{ color: 'white' }}>Edit</span>
+                                </CButton>{' '}
+                                &nbsp;
+                                <CButton type="button" className="btn btn-danger btn-sm">
+                                    <span style={{ color: 'white' }}>Delete</span>
+                                </CButton>{' '}
+                            </CTableDataCell>
                         </CTableRow>
                     </CTableBody>
                 </CTable>
@@ -128,4 +205,4 @@ function ComponentElement() {
     )
 }
 
-export default ComponentElement;
+export default ComponentElement

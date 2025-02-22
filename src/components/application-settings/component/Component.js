@@ -25,7 +25,6 @@ function Component() {
 
   const handleAddFields = () => {
     setFormFields([...formFields, { id: Date.now() }])
-    console.log(formFields)
   }
 
   const handleRemoveFields = (id) => {
@@ -73,7 +72,7 @@ function Component() {
                 </CFormFeedback>
               </CCol>
               <CCol sm={4}>
-                <CFormLabel>Module Name</CFormLabel>
+                <CFormLabel>Module</CFormLabel>
                 <CFormSelect style={{ cursor: 'pointer' }} required>
                   <option value="-1">Select a module</option>
                 </CFormSelect>
@@ -84,16 +83,30 @@ function Component() {
 
               <div className="w-100"></div>
 
-              <CCol sm={7}>
+              <CCol sm={3}>
+                <CFormLabel>Key Name</CFormLabel>
+              </CCol>
+              <CCol sm={3}>
                 <CFormLabel>Component Name</CFormLabel>
               </CCol>
-              <CCol sm={2}>
+              <CCol sm={3}>
                 <CFormLabel>Status</CFormLabel>
               </CCol>
+              <CCol sm={1}></CCol>
 
               {formFields.map((field) => (
                 <React.Fragment key={field.id}>
-                  <CCol sm={7}>
+                  <CCol sm={3}>
+                    <CFormInput
+                      htmlFor={`specificSizeInputName-${field.id}`}
+                      placeholder="Key name"
+                      required
+                    />
+                    <CFormFeedback tooltip invalid>
+                      Please provide a key name.
+                    </CFormFeedback>
+                  </CCol>
+                  <CCol sm={3}>
                     <CFormInput
                       htmlFor={`specificSizeInputName-${field.id}`}
                       placeholder="Name"
@@ -161,6 +174,7 @@ function Component() {
             <CTableRow>
               <CTableHeaderCell scope="col">Application Scope</CTableHeaderCell>
               <CTableHeaderCell scope="col">Module</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Key</CTableHeaderCell>
               <CTableHeaderCell scope="col">Component</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
               <CTableHeaderCell scope="col">Action</CTableHeaderCell>
@@ -168,6 +182,7 @@ function Component() {
           </CTableHead>
           <CTableBody>
             <CTableRow>
+              <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>Otto</CTableDataCell>
               <CTableDataCell>Otto</CTableDataCell>
