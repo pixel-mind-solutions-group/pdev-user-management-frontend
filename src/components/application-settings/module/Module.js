@@ -21,6 +21,14 @@ import {
 
 const Module = () => {
   const [validated, setValidated] = useState(false)
+
+  const [formFields, setFormFields] = useState([{ id: 1 }])
+
+  const handleAddFields = () => {
+    setFormFields([...formFields, { id: Date.now() }])
+    console.log(formFields)
+  }
+
   const handleSubmit = (event) => {
     const form = event.currentTarget
     if (form.checkValidity() === false) {
@@ -52,14 +60,7 @@ const Module = () => {
               validated={validated}
               onSubmit={handleSubmit}
             >
-              <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeInputName">Name</CFormLabel>
-                <CFormInput id="specificSizeInputName" placeholder="Name" required />
-                <CFormFeedback tooltip invalid>
-                  Please provide a name.
-                </CFormFeedback>
-              </CCol>
-              <CCol sm={4}>
+              <CCol sm={3}>
                 <CFormLabel htmlFor="specificSizeSelect">Application Scope</CFormLabel>
                 <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
                   <option value="-1">Select an scope</option>
@@ -68,17 +69,53 @@ const Module = () => {
                   Please select an scope.
                 </CFormFeedback>
               </CCol>
-              <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeSelect">Status</CFormLabel>
-                <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
-                  <option value="-1">Select a status</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="IN-ACTIVE">In-active</option>
-                </CFormSelect>
-                <CFormFeedback tooltip invalid>
-                  Please select a status.
-                </CFormFeedback>
+
+              <div className="w-100"></div>
+
+              {formFields.map((field) => (
+                <React.Fragment key={field.id}>
+                  <CCol sm={7}>
+                    <CFormLabel htmlFor={`specificSizeInputName-${field.id}`}>Name</CFormLabel>
+                    <CFormInput
+                      id={`specificSizeInputName-${field.id}`}
+                      placeholder="Name"
+                      required
+                    />
+                    <CFormFeedback tooltip invalid>
+                      Please provide a name.
+                    </CFormFeedback>
+                  </CCol>
+                  <CCol sm={3}>
+                    <CFormLabel htmlFor={`specificSizeSelect-${field.id}`}>Status</CFormLabel>
+                    <CFormSelect
+                      id={`specificSizeSelect-${field.id}`}
+                      style={{ cursor: 'pointer' }}
+                      required
+                    >
+                      <option value="-1">Select a status</option>
+                      <option value="ACTIVE">Active</option>
+                      <option value="IN-ACTIVE">In-active</option>
+                    </CFormSelect>
+                    <CFormFeedback tooltip invalid>
+                      Please select a status.
+                    </CFormFeedback>
+                  </CCol>
+                </React.Fragment>
+              ))}
+
+              <CCol sm={2}>
+                <CCol xs="auto" style={{ marginTop: '32px' }}>
+                  <CButton
+                    type="button"
+                    className="btn btn-success btn-sm"
+                    onClick={handleAddFields}
+                  >
+                    <strong style={{ color: 'white' }}>+</strong>
+                  </CButton>
+                </CCol>
               </CCol>
+
+              <div className="w-100"></div>
               <CCol xs="auto" style={{ marginTop: '40px' }}>
                 <CButton color="primary" type="submit">
                   Create
@@ -92,15 +129,15 @@ const Module = () => {
         <CTable>
           <CTableHead color="dark">
             <CTableRow>
-              <CTableHeaderCell scope="col">Name</CTableHeaderCell>
               <CTableHeaderCell scope="col">Application Scope</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Name</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
             <CTableRow>
-              <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>Otto</CTableDataCell>
+              <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>@mdo</CTableDataCell>
             </CTableRow>
           </CTableBody>
