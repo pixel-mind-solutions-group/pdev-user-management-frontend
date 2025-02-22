@@ -100,6 +100,7 @@ const ApplicationScope = () => {
               <CTableHeaderCell scope="col">Scope</CTableHeaderCell>
               <CTableHeaderCell scope="col">Unique ID</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Action</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
@@ -107,6 +108,15 @@ const ApplicationScope = () => {
               <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>Otto</CTableDataCell>
               <CTableDataCell>@mdo</CTableDataCell>
+              <CTableDataCell>
+                <CButton type="button" className="btn btn-primary btn-sm">
+                  <span style={{ color: 'white' }}>Edit</span>
+                </CButton>{' '}
+                &nbsp;
+                <CButton type="button" className="btn btn-danger btn-sm">
+                  <span style={{ color: 'white' }}>Delete</span>
+                </CButton>{' '}
+              </CTableDataCell>
             </CTableRow>
           </CTableBody>
         </CTable>

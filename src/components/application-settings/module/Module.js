@@ -24,8 +24,6 @@ const Module = () => {
 
   const [formFields, setFormFields] = useState([{ id: 1 }])
 
-  const [addedFieldId, setAddedFieldId] = useState(1)
-
   const handleAddFields = () => {
     setFormFields([...formFields, { id: Date.now() }])
   }
@@ -65,10 +63,10 @@ const Module = () => {
               validated={validated}
               onSubmit={handleSubmit}
             >
-              <CCol sm={3}>
+              <CCol sm={4}>
                 <CFormLabel htmlFor="specificSizeSelect">Application Scope</CFormLabel>
                 <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
-                  <option value="-1">Select an scope</option>
+                  <option value="-1">Select an application scope</option>
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select an scope.
@@ -155,8 +153,9 @@ const Module = () => {
           <CTableHead color="dark">
             <CTableRow>
               <CTableHeaderCell scope="col">Application Scope</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Name</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Module Name</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Action</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
@@ -164,6 +163,15 @@ const Module = () => {
               <CTableDataCell>Otto</CTableDataCell>
               <CTableDataCell>Mark</CTableDataCell>
               <CTableDataCell>@mdo</CTableDataCell>
+              <CTableDataCell>
+                <CButton type="button" className="btn btn-primary btn-sm">
+                  <span style={{ color: 'white' }}>Edit</span>
+                </CButton>{' '}
+                &nbsp;
+                <CButton type="button" className="btn btn-danger btn-sm">
+                  <span style={{ color: 'white' }}>Delete</span>
+                </CButton>{' '}
+              </CTableDataCell>
             </CTableRow>
           </CTableBody>
         </CTable>
