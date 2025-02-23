@@ -25,6 +25,12 @@ import { getAll, createOrUpdate } from '../../../service/application-scope/Appli
 const ApplicationScope = () => {
   const [validated, setValidated] = useState(false)
   const [applicationScopes, setApplicationScopes] = useState([])
+  const [formData, setFormData] = useState({
+    applicationScopeId: '',
+    scope: '',
+    status: '',
+    uniqueId: '',
+  })
 
   useEffect(() => {
     const getAllAppScopes = async () => {
@@ -51,9 +57,7 @@ const ApplicationScope = () => {
     getAllAppScopes()
   }, [])
 
-  // const createOrUpdate = () => { }
-
-  const handleSubmit = (event) => {
+  const createOrUpdate = (event) => {
     const form = event.currentTarget
     if (form.checkValidity() === false) {
       event.preventDefault()
@@ -70,6 +74,14 @@ const ApplicationScope = () => {
     })
     setValidated(true)
   }
+
+  const handleFormChange = (e) => {
+    const { id, value } = e.target
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }))
+  }
   return (
     <CRow>
       <CCol xs={12}>
@@ -82,21 +94,28 @@ const ApplicationScope = () => {
               className="row gx-3 gy-2 align-items-center"
               noValidate
               validated={validated}
-              onSubmit={handleSubmit}
+              onSubmit={createOrUpdate}
             >
               <CCol sm={4}>
                 <CFormLabel htmlFor="specificSizeInputName">Scope</CFormLabel>
-                <CFormInput id="specificSizeInputName" placeholder="Scope" required />
+                <CFormInput
+                  id="scope"
+                  placeholder="Scope"
+                  value={formData.scope}
+                  onChange={handleFormChange}
+                  required
+                />
                 <CFormFeedback tooltip invalid>
                   Please provide a scope.
                 </CFormFeedback>
               </CCol>
               <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeInputGroupUsername">Unique ID</CFormLabel>
+                <CFormLabel htmlFor="uniqueId">Unique ID</CFormLabel>
                 <CInputGroup>
                   <CFormInput
-                    id="specificSizeInputGroupUsername"
+                    id="uniqueId"
                     placeholder="Unique ID"
+                    value={formData.uniqueId}
                     disabled
                   />
                   <CFormFeedback tooltip invalid>
@@ -105,11 +124,17 @@ const ApplicationScope = () => {
                 </CInputGroup>
               </CCol>
               <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeSelect">Status</CFormLabel>
-                <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
+                <CFormLabel htmlFor="status">Status</CFormLabel>
+                <CFormSelect
+                  id="status"
+                  style={{ cursor: 'pointer' }}
+                  value={formData.status}
+                  onChange={handleFormChange}
+                  required
+                >
                   <option value="-1">Select a status</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="IN-ACTIVE">In-active</option>
+                  <option value="Active">Active</option>
+                  <option value="In_active">In-active</option>
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select a status.
@@ -158,7 +183,7 @@ const ApplicationScope = () => {
           </CTableBody>
         </CTable>
       </CCol>
-    </CRow >
+    </CRow>
   )
 }
 export default ApplicationScope
