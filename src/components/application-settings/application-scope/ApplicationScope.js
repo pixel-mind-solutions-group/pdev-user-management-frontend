@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -19,9 +19,27 @@ import {
   CTableHeaderCell,
   CTableHead,
 } from '@coreui/react'
+import { getAll } from '../../../api/application-scope/ApplicationScopeApi'
 
 const ApplicationScope = () => {
   const [validated, setValidated] = useState(false)
+
+  useEffect(() => {
+    const getAllAppScopes = async () => {
+      try {
+        const data = await getAll()
+        if (data.data != null && data.status != 'NO_CONTENT') {
+          console.log(data.data)
+        } else {
+          console.log('no content !')
+        }
+      } catch (error) {
+        console.error('Error occuring while calling user service to fetch all scopes. ', error)
+      }
+    }
+    getAllAppScopes()
+  }, [])
+
   const handleSubmit = (event) => {
     const form = event.currentTarget
     if (form.checkValidity() === false) {
