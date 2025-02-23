@@ -38,8 +38,10 @@
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.5",
+    "react-sweetalert2": "^0.6.0",
     "redux": "5.0.1",
     "simplebar-react": "^3.3.0",
+    "sweetalert2": "^11.17.2",
     "typescript": "^5.7.3"
   },
   "devDependencies": {

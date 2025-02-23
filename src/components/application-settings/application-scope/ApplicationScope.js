@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import Swal from 'sweetalert2'
 import {
   CButton,
   CCard,
@@ -28,10 +29,19 @@ const ApplicationScope = () => {
     const getAllAppScopes = async () => {
       try {
         const data = await getAll()
-        if (data.data != null && data.status != 'NO_CONTENT') {
-          console.log(data.data)
+        if (data.status == 'OK') {
+          console.log(data)
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: data.message,
+          })
         } else {
-          console.log('no content !')
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message,
+          })
         }
       } catch (error) {
         console.error('Error occuring while calling user service to fetch all scopes. ', error)
