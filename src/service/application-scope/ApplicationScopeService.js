@@ -11,16 +11,16 @@ export const getAll = async () => {
   }
 }
 
-export const createOrUpdate = (data) => {
+export const createOrUpdate = async (data) => {
   try {
-    const response = fetch(`${APPLICATION_SCOPE_API_URL}/create-or-update`, {
+    const response = await fetch(`${APPLICATION_SCOPE_API_URL}/create-or-update`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     })
-    return response.json()
+    return await response.json()
   } catch (error) {
     throw error
   }

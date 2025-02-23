@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import Swal from 'sweetalert2'
 import {
   CButton,
@@ -28,16 +28,53 @@ const ApplicationScope = () => {
   const [formData, setFormData] = useState({
     applicationScopeId: '',
     scope: '',
-    status: '',
+    status: '-1',
     uniqueId: '',
   })
+  const statusRef = useRef(null)
 
   useEffect(() => {
-    const getAllAppScopes = async () => {
+    getAllAppScopes()
+  }, [])
+
+  const getAllAppScopes = async () => {
+    try {
+      const data = await getAll()
+      if (data.status == 'OK') {
+        setApplicationScopes(data.data)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch all scopes. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Application scopes fetching failed.',
+      })
+    }
+  }
+
+  const handleSubmit = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+      setValidated(true)
+    } else {
       try {
-        const data = await getAll()
+        const data = await createOrUpdate(formData)
         if (data.status == 'OK') {
-          setApplicationScopes(data.data)
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: data.message,
+          })
+          getAllAppScopes()
         } else {
           Swal.fire({
             icon: 'error',
@@ -46,33 +83,14 @@ const ApplicationScope = () => {
           })
         }
       } catch (error) {
-        console.error('Error occuring while calling user service to fetch all scopes. ', error)
+        console.error('Error occuring while creating scope. ', error)
         Swal.fire({
           icon: 'error',
           title: 'Internal Server Error',
-          text: 'Application scopes fetching failed.',
+          text: 'Application scope creation failed.',
         })
       }
     }
-    getAllAppScopes()
-  }, [])
-
-  const createOrUpdate = (event) => {
-    const form = event.currentTarget
-    if (form.checkValidity() === false) {
-      event.preventDefault()
-      event.stopPropagation()
-    }
-
-    const selects = form.querySelectorAll('select')
-    selects.forEach((select) => {
-      if (select.value === '-1') {
-        select.setCustomValidity('Please select an option.')
-      } else {
-        select.setCustomValidity('')
-      }
-    })
-    setValidated(true)
   }
 
   const handleFormChange = (e) => {
@@ -94,7 +112,7 @@ const ApplicationScope = () => {
               className="row gx-3 gy-2 align-items-center"
               noValidate
               validated={validated}
-              onSubmit={createOrUpdate}
+              onSubmit={handleSubmit}
             >
               <CCol sm={4}>
                 <CFormLabel htmlFor="specificSizeInputName">Scope</CFormLabel>
@@ -130,6 +148,7 @@ const ApplicationScope = () => {
                   style={{ cursor: 'pointer' }}
                   value={formData.status}
                   onChange={handleFormChange}
+                  ref={statusRef}
                   required
                 >
                   <option value="-1">Select a status</option>
