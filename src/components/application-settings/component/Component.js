@@ -109,7 +109,7 @@ function Component() {
                   <CCol sm={3}>
                     <CFormInput
                       htmlFor={`specificSizeInputName-${field.id}`}
-                      placeholder="Name"
+                      placeholder="Component Name"
                       required
                     />
                     <CFormFeedback tooltip invalid>
