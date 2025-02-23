@@ -20,22 +20,18 @@ import {
   CTableHeaderCell,
   CTableHead,
 } from '@coreui/react'
-import { getAll } from '../../../api/application-scope/ApplicationScopeApi'
+import { getAll, createOrUpdate } from '../../../service/application-scope/ApplicationScopeService'
 
 const ApplicationScope = () => {
   const [validated, setValidated] = useState(false)
+  const [applicationScopes, setApplicationScopes] = useState([])
 
   useEffect(() => {
     const getAllAppScopes = async () => {
       try {
         const data = await getAll()
         if (data.status == 'OK') {
-          console.log(data)
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: data.message,
-          })
+          setApplicationScopes(data.data)
         } else {
           Swal.fire({
             icon: 'error',
@@ -45,10 +41,17 @@ const ApplicationScope = () => {
         }
       } catch (error) {
         console.error('Error occuring while calling user service to fetch all scopes. ', error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Internal Server Error',
+          text: 'Application scopes fetching failed.',
+        })
       }
     }
     getAllAppScopes()
   }, [])
+
+  // const createOrUpdate = () => { }
 
   const handleSubmit = (event) => {
     const form = event.currentTarget
@@ -125,6 +128,7 @@ const ApplicationScope = () => {
         <CTable>
           <CTableHead color="dark">
             <CTableRow>
+              <CTableHeaderCell scope="col">No</CTableHeaderCell>
               <CTableHeaderCell scope="col">Scope</CTableHeaderCell>
               <CTableHeaderCell scope="col">Unique ID</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
@@ -132,24 +136,29 @@ const ApplicationScope = () => {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            <CTableRow>
-              <CTableDataCell>Mark</CTableDataCell>
-              <CTableDataCell>Otto</CTableDataCell>
-              <CTableDataCell>@mdo</CTableDataCell>
-              <CTableDataCell>
-                <CButton type="button" className="btn btn-primary btn-sm">
-                  <span style={{ color: 'white' }}>Edit</span>
-                </CButton>{' '}
-                &nbsp;
-                <CButton type="button" className="btn btn-danger btn-sm">
-                  <span style={{ color: 'white' }}>Delete</span>
-                </CButton>{' '}
-              </CTableDataCell>
-            </CTableRow>
+            {applicationScopes.map((scope, index) => (
+              <React.Fragment key={scope.applicationScopeId}>
+                <CTableRow>
+                  <CTableDataCell>{index + 1}</CTableDataCell>
+                  <CTableDataCell>{scope.scope}</CTableDataCell>
+                  <CTableDataCell>{scope.uniqueId}</CTableDataCell>
+                  <CTableDataCell>{scope.status}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton type="button" className="btn btn-primary btn-sm">
+                      <span style={{ color: 'white' }}>Edit</span>
+                    </CButton>{' '}
+                    &nbsp;
+                    <CButton type="button" className="btn btn-danger btn-sm">
+                      <span style={{ color: 'white' }}>Delete</span>
+                    </CButton>{' '}
+                  </CTableDataCell>
+                </CTableRow>
+              </React.Fragment>
+            ))}
           </CTableBody>
         </CTable>
       </CCol>
-    </CRow>
+    </CRow >
   )
 }
 export default ApplicationScope
