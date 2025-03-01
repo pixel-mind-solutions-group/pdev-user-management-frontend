@@ -18,6 +18,7 @@ import {
   CTableHeaderCell,
   CTableHead,
 } from '@coreui/react'
+import Pagination from '../../UI/pagination/Pagination'
 import Swal from 'sweetalert2'
 import { getAll, createOrUpdate } from '../../../service/module/ModuleService'
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
@@ -27,8 +28,13 @@ const Module = () => {
   const [formModules, setFormModules] = useState([{ id: 1 }])
   const [formModuleFields, setFormModuleFiedls] = useState([])
 
-  const [validated, setValidated] = useState(false)
+  // page response
+  const [totalPages, setTotalPages] = useState()
+  const [currentPage, setCurrentPage] = useState(0)
   const [modules, setModules] = useState([])
+  const pageSize = 10
+
+  const [validated, setValidated] = useState(false)
   const [applicationScopes, setApplicationScopes] = useState([])
   const [formData, setFormData] = useState({
     applicationScope: '-1',
@@ -68,9 +74,12 @@ const Module = () => {
   }
 
   useEffect(() => {
-    getAllModules()
     getAllScopse()
   }, [])
+
+  useEffect(() => {
+    getAllModules(currentPage, pageSize)
+  }, [currentPage])
 
   const handleSubmit = async (event) => {
     const form = event.currentTarget
@@ -89,7 +98,7 @@ const Module = () => {
             title: 'Success',
             text: data.message,
           })
-          getAllModules()
+          getAllModules(currentPage, pageSize)
         } else {
           Swal.fire({
             icon: 'error',
@@ -108,11 +117,13 @@ const Module = () => {
     }
   }
 
-  const getAllModules = async () => {
+  const getAllModules = async (currentPage, pageSize) => {
     try {
-      const data = await getAll()
+      const data = await getAll(currentPage, pageSize)
       if (data.data.status == 'OK') {
-        setModules(data.data.data)
+        setModules(data.data.data.dataList)
+        setTotalPages(data.data.data.totalPages)
+        setCurrentPage(data.data.data.currentPage)
       } else {
         Swal.fire({
           icon: 'error',
@@ -327,6 +338,11 @@ const Module = () => {
             ))}
           </CTableBody>
         </CTable>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </CCol>
     </CRow>
   )

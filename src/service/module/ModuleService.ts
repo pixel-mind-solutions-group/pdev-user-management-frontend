@@ -3,9 +3,14 @@ import { environment } from '../../environments/environment'
 
 const MODULE_API_URL = `${environment.baseUrl}` + '/module/v1'
 
-export const getAll = async () => {
+export const getAll = (currentPage, size) => {
   try {
-    const response = await axios.get(`${MODULE_API_URL}/get-all`)
+    const response = axios.get(`${MODULE_API_URL}/get-all`, {
+      params: {
+        page: currentPage,
+        size: size,
+      },
+    })
     return response
   } catch (error) {
     throw error
