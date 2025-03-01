@@ -23,24 +23,48 @@ import { getAll, createOrUpdate } from '../../../service/module/ModuleService'
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
 
 const Module = () => {
-  const [validated, setValidated] = useState(false)
+  // dynamic form fields
   const [formModules, setFormModules] = useState([{ id: 1 }])
-  const [moduleCount, setModuleCount] = useState(1)
-  const [formModuleFields, setFormModuleFields] = useState([])
+  const [formModuleFields, setFormModuleFiedls] = useState([])
+
+  const [validated, setValidated] = useState(false)
   const [modules, setModules] = useState([])
   const [applicationScopes, setApplicationScopes] = useState([])
   const [formData, setFormData] = useState({
     applicationScope: '-1',
+    modules: [],
   })
 
+  // ( + ) => Adding module fields
   const handleAddFields = () => {
-    setFormModules([...formModules, { id: moduleCount + 1 }])
-    setModuleCount(moduleCount + 1)
+    setFormModules((prevFields) => {
+      const lengthOfArr = prevFields.length
+      const updatedFields = [...prevFields]
+      const lastFieldId = updatedFields[lengthOfArr - 1].id + 1
+      updatedFields[lengthOfArr] = { ...updatedFields[lengthOfArr], ['id']: lastFieldId }
+      return updatedFields
+    })
   }
 
+  // ( - ) => Removing module fields
   const handleRemoveFields = (id) => {
-    setFormModuleFields((prevArray) => prevArray.filter((_, i) => i !== id))
     setFormModules(formModules.filter((field) => field.id !== id))
+    const moduleArrayIndex = id - 1
+    setFormModuleFiedls((prevFields) => {
+      let updatedFields = [...prevFields]
+      updatedFields = updatedFields.filter((_, index) => index !== moduleArrayIndex)
+      return updatedFields
+    })
+  }
+
+  // Setting array of modules
+  const handleChangeModuleArray = (id, field, value) => {
+    const moduleArrayIndex = id - 1
+    setFormModuleFiedls((prevFields) => {
+      const updatedObjects = [...prevFields]
+      updatedObjects[moduleArrayIndex] = { ...updatedObjects[moduleArrayIndex], [field]: value }
+      return updatedObjects
+    })
   }
 
   useEffect(() => {
@@ -55,15 +79,17 @@ const Module = () => {
       event.stopPropagation()
       setValidated(true)
     } else {
+      const updatedForm = { ...formData }
+      updatedForm.modules = formModuleFields
       try {
-        const data = await createOrUpdate(formData)
+        const data = await createOrUpdate(updatedForm)
         if (data.status == 'OK') {
           Swal.fire({
             icon: 'success',
             title: 'Success',
             text: data.message,
           })
-          getAllAppScopes()
+          getAllModules()
         } else {
           Swal.fire({
             icon: 'error',
@@ -75,8 +101,8 @@ const Module = () => {
         console.error('Error occuring while creating modules. ', error)
         Swal.fire({
           icon: 'error',
-          title: 'Internal Server Error',
-          text: 'Modules creation failed.',
+          title: 'Error',
+          text: error.response.data.details[1],
         })
       }
     }
@@ -134,15 +160,6 @@ const Module = () => {
     }))
   }
 
-  const handleModuleDynamicFieldsChange = (index, field, value) => {
-    setFormModuleFields((prevFields) => {
-      const updatedFields = [...prevFields]
-      updatedFields[index] = { ...updatedFields[index], [field]: value }
-      console.log(updatedFields)
-      return updatedFields
-    })
-  }
-
   return (
     <CRow>
       <CCol xs={12}>
@@ -198,9 +215,9 @@ const Module = () => {
                     <CFormInput
                       id={`key_${field.id}`}
                       placeholder="Key name"
-                      onChange={(e) =>
-                        handleModuleDynamicFieldsChange(field.id, 'key', e.target.value)
-                      }
+                      onChange={(e) => {
+                        handleChangeModuleArray(field.id, 'key', e.target.value)
+                      }}
                       required
                     />
                     <CFormFeedback tooltip invalid>
@@ -211,9 +228,9 @@ const Module = () => {
                     <CFormInput
                       id={`module_${field.id}`}
                       placeholder="Module name"
-                      onChange={(e) =>
-                        handleModuleDynamicFieldsChange(field.id, 'module', e.target.value)
-                      }
+                      onChange={(e) => {
+                        handleChangeModuleArray(field.id, 'module', e.target.value)
+                      }}
                       required
                     />
                     <CFormFeedback tooltip invalid>
@@ -224,14 +241,14 @@ const Module = () => {
                     <CFormSelect
                       id={`status_${field.id}`}
                       style={{ cursor: 'pointer' }}
-                      onChange={(e) =>
-                        handleModuleDynamicFieldsChange(field.id, 'status', e.target.value)
-                      }
+                      onChange={(e) => {
+                        handleChangeModuleArray(field.id, 'status', e.target.value)
+                      }}
                       required
                     >
                       <option value="-1">Select a status</option>
-                      <option value="ACTIVE">Active</option>
-                      <option value="IN-ACTIVE">In-active</option>
+                      <option value="Active">Active</option>
+                      <option value="In_active">In-active</option>
                     </CFormSelect>
                     <CFormFeedback tooltip invalid>
                       Please select a status.

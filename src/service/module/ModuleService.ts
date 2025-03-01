@@ -14,12 +14,10 @@ export const getAll = async () => {
 
 export const createOrUpdate = async (data) => {
   try {
-    const response = await axios.post(`${MODULE_API_URL}/create-or-update`, {
-      method: 'POST',
+    const response = await axios.post(`${MODULE_API_URL}/create-or-update`, data, {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
     })
     return response.data
   } catch (error) {

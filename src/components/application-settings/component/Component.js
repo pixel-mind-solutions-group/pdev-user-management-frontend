@@ -123,8 +123,8 @@ function Component() {
                       required
                     >
                       <option value="-1">Select a status</option>
-                      <option value="ACTIVE">Active</option>
-                      <option value="IN-ACTIVE">In-active</option>
+                      <option value="Active">Active</option>
+                      <option value="In_active">In-active</option>
                     </CFormSelect>
                     <CFormFeedback tooltip invalid>
                       Please select a status.
