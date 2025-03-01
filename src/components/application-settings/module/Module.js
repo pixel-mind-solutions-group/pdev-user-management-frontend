@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -18,11 +18,17 @@ import {
   CTableHeaderCell,
   CTableHead,
 } from '@coreui/react'
+import { getAll, createOrUpdate } from '../../../service/module/ModuleService'
 
 const Module = () => {
   const [validated, setValidated] = useState(false)
-
-  const [formFields, setFormFields] = useState([{ id: 1 }])
+  const [modules, setModules] = useState([])
+  const [formData, setFormData] = useState({
+    key: '',
+    module: '',
+    status: '',
+    applicationScope: '',
+  })
 
   const handleAddFields = () => {
     setFormFields([...formFields, { id: Date.now() }])
@@ -32,23 +38,66 @@ const Module = () => {
     setFormFields(formFields.filter((field) => field.id !== id))
   }
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    getAllModules()
+  }, [])
+
+  const handleSubmit = async (event) => {
     const form = event.currentTarget
     if (form.checkValidity() === false) {
       event.preventDefault()
       event.stopPropagation()
-    }
-
-    const selects = form.querySelectorAll('select')
-    selects.forEach((select) => {
-      if (select.value === '-1') {
-        select.setCustomValidity('Please select an option.')
-      } else {
-        select.setCustomValidity('')
+      setValidated(true)
+    } else {
+      try {
+        const data = await createOrUpdate(formData)
+        if (data.status == 'OK') {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: data.message,
+          })
+          getAllAppScopes()
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message,
+          })
+        }
+      } catch (error) {
+        console.error('Error occuring while creating modules. ', error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Internal Server Error',
+          text: 'Modules creation failed.',
+        })
       }
-    })
-    setValidated(true)
+    }
   }
+
+  const getAllModules = async () => {
+    try {
+      const data = await getAll()
+      if (data.status == 'OK') {
+        setModules(data.data)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch all modules. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Modules fetching failed.',
+      })
+    }
+  }
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -64,8 +113,8 @@ const Module = () => {
               onSubmit={handleSubmit}
             >
               <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeSelect">Application Scope</CFormLabel>
-                <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
+                <CFormLabel htmlFor="applicationScope">Application Scope</CFormLabel>
+                <CFormSelect id="applicationScope" style={{ cursor: 'pointer' }} required>
                   <option value="-1">Select an application scope</option>
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
@@ -88,34 +137,22 @@ const Module = () => {
                 <CCol sm={1}></CCol>
               </React.Fragment>
 
-              {formFields.map((field) => (
+              {modules.map((field) => (
                 <React.Fragment key={field.id}>
                   <CCol sm={3}>
-                    <CFormInput
-                      id={`specificSizeInputName-${field.id}`}
-                      placeholder="Key name"
-                      required
-                    />
+                    <CFormInput id="key" placeholder="Key name" required />
                     <CFormFeedback tooltip invalid>
                       Please provide a key name.
                     </CFormFeedback>
                   </CCol>
                   <CCol sm={3}>
-                    <CFormInput
-                      id={`specificSizeInputName-${field.id}`}
-                      placeholder="Module name"
-                      required
-                    />
+                    <CFormInput id="module" placeholder="Module name" required />
                     <CFormFeedback tooltip invalid>
                       Please provide a module name.
                     </CFormFeedback>
                   </CCol>
                   <CCol sm={3}>
-                    <CFormSelect
-                      id={`specificSizeSelect-${field.id}`}
-                      style={{ cursor: 'pointer' }}
-                      required
-                    >
+                    <CFormSelect id="status" style={{ cursor: 'pointer' }} required>
                       <option value="-1">Select a status</option>
                       <option value="ACTIVE">Active</option>
                       <option value="IN-ACTIVE">In-active</option>
