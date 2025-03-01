@@ -25,20 +25,21 @@ import { getAll as getAllAppScopes } from '../../../service/application-scope/Ap
 const Module = () => {
   const [validated, setValidated] = useState(false)
   const [formModules, setFormModules] = useState([{ id: 1 }])
+  const [moduleCount, setModuleCount] = useState(1)
+  const [formModuleFields, setFormModuleFields] = useState([])
   const [modules, setModules] = useState([])
   const [applicationScopes, setApplicationScopes] = useState([])
   const [formData, setFormData] = useState({
-    key: '',
-    module: '',
-    status: '',
-    applicationScope: '',
+    applicationScope: '-1',
   })
 
   const handleAddFields = () => {
-    setFormModules([...formModules, { id: Date.now() }])
+    setFormModules([...formModules, { id: moduleCount + 1 }])
+    setModuleCount(moduleCount + 1)
   }
 
   const handleRemoveFields = (id) => {
+    setFormModuleFields((prevArray) => prevArray.filter((_, i) => i !== id))
     setFormModules(formModules.filter((field) => field.id !== id))
   }
 
@@ -125,6 +126,23 @@ const Module = () => {
     }
   }
 
+  const handleFormChange = (e) => {
+    const { id, value } = e.target
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }))
+  }
+
+  const handleModuleDynamicFieldsChange = (index, field, value) => {
+    setFormModuleFields((prevFields) => {
+      const updatedFields = [...prevFields]
+      updatedFields[index] = { ...updatedFields[index], [field]: value }
+      console.log(updatedFields)
+      return updatedFields
+    })
+  }
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -141,10 +159,17 @@ const Module = () => {
             >
               <CCol sm={4}>
                 <CFormLabel htmlFor="applicationScope">Application Scope</CFormLabel>
-                <CFormSelect id="applicationScope" style={{ cursor: 'pointer' }} required>
+                <CFormSelect
+                  id="applicationScope"
+                  style={{ cursor: 'pointer' }}
+                  required
+                  onChange={handleFormChange}
+                >
                   <option value="-1">Select an application scope</option>
                   {applicationScopes.map((scope) => (
-                    <option value={scope.id}>{scope.scope}</option>
+                    <option key={scope.uniqueId} value={scope.uniqueId}>
+                      {scope.scope}
+                    </option>
                   ))}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
@@ -170,19 +195,40 @@ const Module = () => {
               {formModules.map((field) => (
                 <React.Fragment key={field.id}>
                   <CCol sm={3}>
-                    <CFormInput id="key" placeholder="Key name" required />
+                    <CFormInput
+                      id={`key_${field.id}`}
+                      placeholder="Key name"
+                      onChange={(e) =>
+                        handleModuleDynamicFieldsChange(field.id, 'key', e.target.value)
+                      }
+                      required
+                    />
                     <CFormFeedback tooltip invalid>
                       Please provide a key name.
                     </CFormFeedback>
                   </CCol>
                   <CCol sm={3}>
-                    <CFormInput id="module" placeholder="Module name" required />
+                    <CFormInput
+                      id={`module_${field.id}`}
+                      placeholder="Module name"
+                      onChange={(e) =>
+                        handleModuleDynamicFieldsChange(field.id, 'module', e.target.value)
+                      }
+                      required
+                    />
                     <CFormFeedback tooltip invalid>
                       Please provide a module name.
                     </CFormFeedback>
                   </CCol>
                   <CCol sm={3}>
-                    <CFormSelect id="status" style={{ cursor: 'pointer' }} required>
+                    <CFormSelect
+                      id={`status_${field.id}`}
+                      style={{ cursor: 'pointer' }}
+                      onChange={(e) =>
+                        handleModuleDynamicFieldsChange(field.id, 'status', e.target.value)
+                      }
+                      required
+                    >
                       <option value="-1">Select a status</option>
                       <option value="ACTIVE">Active</option>
                       <option value="IN-ACTIVE">In-active</option>
