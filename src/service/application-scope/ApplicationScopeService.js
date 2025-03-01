@@ -2,9 +2,23 @@ import { environment } from '../../environments/environment'
 
 const APPLICATION_SCOPE_API_URL = `${environment.baseUrl}` + '/application-scope/v1'
 
-export const getAll = async () => {
+export const getAll = async (currentPage, pageSize) => {
   try {
     const response = await fetch(`${APPLICATION_SCOPE_API_URL}/get-all`)
+    return await response.json()
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getAllWithPagination = async (currentPage, pageSize) => {
+  try {
+    const response = await fetch(`${APPLICATION_SCOPE_API_URL}/get-all-page`, {
+      params: {
+        page: currentPage,
+        size: pageSize,
+      },
+    })
     return await response.json()
   } catch (error) {
     throw error

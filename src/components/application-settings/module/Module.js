@@ -20,7 +20,7 @@ import {
 } from '@coreui/react'
 import Pagination from '../../UI/pagination/Pagination'
 import Swal from 'sweetalert2'
-import { getAll, createOrUpdate } from '../../../service/module/ModuleService'
+import { getAllWithPagination, createOrUpdate } from '../../../service/module/ModuleService'
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
 
 const Module = () => {
@@ -119,7 +119,7 @@ const Module = () => {
 
   const getAllModules = async (currentPage, pageSize) => {
     try {
-      const data = await getAll(currentPage, pageSize)
+      const data = await getAllWithPagination(currentPage, pageSize)
       if (data.data.status == 'OK') {
         setModules(data.data.data.dataList)
         setTotalPages(data.data.data.totalPages)

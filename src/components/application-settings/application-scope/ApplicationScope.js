@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, { useEffect, useState, useRef } from 'react'
 import Swal from 'sweetalert2'
 import {
@@ -20,28 +21,38 @@ import {
   CTableHeaderCell,
   CTableHead,
 } from '@coreui/react'
-import { getAll, createOrUpdate } from '../../../service/application-scope/ApplicationScopeService'
+import {
+  getAllWithPagination,
+  createOrUpdate,
+} from '../../../service/application-scope/ApplicationScopeService'
+import Pagination from '../../UI/pagination/Pagination'
 
 const ApplicationScope = () => {
-  const [validated, setValidated] = useState(false)
+  // page response
+  const [totalPages, setTotalPages] = useState()
+  const [currentPage, setCurrentPage] = useState(0)
   const [applicationScopes, setApplicationScopes] = useState([])
+  const pageSize = 10
+
+  const [validated, setValidated] = useState(false)
   const [formData, setFormData] = useState({
     applicationScopeId: '',
     scope: '',
     status: '-1',
     uniqueId: '',
   })
-  const statusRef = useRef(null)
+  
+    useEffect(() => {
+      getAllAppScopes(currentPage, pageSize)
+    }, [currentPage])
 
-  useEffect(() => {
-    getAllAppScopes()
-  }, [])
-
-  const getAllAppScopes = async () => {
+  const getAllAppScopes = async (currentPage, pageSize) => {
     try {
-      const data = await getAll()
+      const data = await getAllWithPagination(currentPage, pageSize)
       if (data.status == 'OK') {
-        setApplicationScopes(data.data)
+        setApplicationScopes(data.data.dataList)
+        setTotalPages(data.data.totalPages)
+        setCurrentPage(data.data.currentPage)
       } else {
         Swal.fire({
           icon: 'error',
@@ -74,7 +85,7 @@ const ApplicationScope = () => {
             title: 'Success',
             text: data.message,
           })
-          getAllAppScopes()
+          getAllAppScopes(currentPage, pageSize)
         } else {
           Swal.fire({
             icon: 'error',
@@ -148,7 +159,6 @@ const ApplicationScope = () => {
                   style={{ cursor: 'pointer' }}
                   value={formData.status}
                   onChange={handleFormChange}
-                  ref={statusRef}
                   required
                 >
                   <option value="-1">Select a status</option>
@@ -201,6 +211,11 @@ const ApplicationScope = () => {
             ))}
           </CTableBody>
         </CTable>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </CCol>
     </CRow>
   )
