@@ -18,11 +18,15 @@ import {
   CTableHeaderCell,
   CTableHead,
 } from '@coreui/react'
+import Swal from 'sweetalert2'
 import { getAll, createOrUpdate } from '../../../service/module/ModuleService'
+import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
 
 const Module = () => {
   const [validated, setValidated] = useState(false)
+  const [formModules, setFormModules] = useState([{ id: 1 }])
   const [modules, setModules] = useState([])
+  const [applicationScopes, setApplicationScopes] = useState([])
   const [formData, setFormData] = useState({
     key: '',
     module: '',
@@ -31,15 +35,16 @@ const Module = () => {
   })
 
   const handleAddFields = () => {
-    setFormFields([...formFields, { id: Date.now() }])
+    setFormModules([...formModules, { id: Date.now() }])
   }
 
   const handleRemoveFields = (id) => {
-    setFormFields(formFields.filter((field) => field.id !== id))
+    setFormModules(formModules.filter((field) => field.id !== id))
   }
 
   useEffect(() => {
     getAllModules()
+    getAllScopse()
   }, [])
 
   const handleSubmit = async (event) => {
@@ -79,13 +84,13 @@ const Module = () => {
   const getAllModules = async () => {
     try {
       const data = await getAll()
-      if (data.status == 'OK') {
-        setModules(data.data)
+      if (data.data.status == 'OK') {
+        setModules(data.data.data)
       } else {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: data.message,
+          text: data.data.message,
         })
       }
     } catch (error) {
@@ -94,6 +99,28 @@ const Module = () => {
         icon: 'error',
         title: 'Internal Server Error',
         text: 'Modules fetching failed.',
+      })
+    }
+  }
+
+  const getAllScopse = async () => {
+    try {
+      const data = await getAllAppScopes()
+      if (data.status == 'OK') {
+        setApplicationScopes(data.data)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch all scopes. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Application scopes fetching failed.',
       })
     }
   }
@@ -116,6 +143,9 @@ const Module = () => {
                 <CFormLabel htmlFor="applicationScope">Application Scope</CFormLabel>
                 <CFormSelect id="applicationScope" style={{ cursor: 'pointer' }} required>
                   <option value="-1">Select an application scope</option>
+                  {applicationScopes.map((scope) => (
+                    <option value={scope.id}>{scope.scope}</option>
+                  ))}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select an scope.
@@ -137,7 +167,7 @@ const Module = () => {
                 <CCol sm={1}></CCol>
               </React.Fragment>
 
-              {modules.map((field) => (
+              {formModules.map((field) => (
                 <React.Fragment key={field.id}>
                   <CCol sm={3}>
                     <CFormInput id="key" placeholder="Key name" required />
@@ -203,29 +233,35 @@ const Module = () => {
         <CTable>
           <CTableHead color="dark">
             <CTableRow>
+              <CTableHeaderCell scope="col">No</CTableHeaderCell>
               <CTableHeaderCell scope="col">Application Scope</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Key</CTableHeaderCell>
               <CTableHeaderCell scope="col">Module</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Key</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
               <CTableHeaderCell scope="col">Action</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            <CTableRow>
-              <CTableDataCell>Otto</CTableDataCell>
-              <CTableDataCell>Otto</CTableDataCell>
-              <CTableDataCell>Mark</CTableDataCell>
-              <CTableDataCell>@mdo</CTableDataCell>
-              <CTableDataCell>
-                <CButton type="button" className="btn btn-primary btn-sm">
-                  <span style={{ color: 'white' }}>Edit</span>
-                </CButton>{' '}
-                &nbsp;
-                <CButton type="button" className="btn btn-danger btn-sm">
-                  <span style={{ color: 'white' }}>Delete</span>
-                </CButton>{' '}
-              </CTableDataCell>
-            </CTableRow>
+            {modules.map((module, index) => (
+              <React.Fragment key={module.id}>
+                <CTableRow>
+                  <CTableDataCell>{index + 1}</CTableDataCell>
+                  <CTableDataCell>{module.applicationScope}</CTableDataCell>
+                  <CTableDataCell>{module.module}</CTableDataCell>
+                  <CTableDataCell>{module.key}</CTableDataCell>
+                  <CTableDataCell>{module.status}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton type="button" className="btn btn-primary btn-sm">
+                      <span style={{ color: 'white' }}>Edit</span>
+                    </CButton>{' '}
+                    &nbsp;
+                    <CButton type="button" className="btn btn-danger btn-sm">
+                      <span style={{ color: 'white' }}>Delete</span>
+                    </CButton>{' '}
+                  </CTableDataCell>
+                </CTableRow>
+              </React.Fragment>
+            ))}
           </CTableBody>
         </CTable>
       </CCol>
