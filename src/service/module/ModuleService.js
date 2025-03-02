@@ -17,9 +17,22 @@ export const getAllWithPagination = (currentPage, size) => {
   }
 }
 
+export const getByUUID = (uuid) => {
+  try {
+    const response = axios.get(`${MODULE_API_URL}/get-by-uuid`, {
+      params: {
+        uuid: uuid,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
 export const getAll = () => {
   try {
-    const response = axios.get(`${MODULE_API_URL}/get-all-page`)
+    const response = axios.get(`${MODULE_API_URL}/get-all`)
     return response
   } catch (error) {
     throw error

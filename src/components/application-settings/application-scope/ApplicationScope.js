@@ -41,10 +41,10 @@ const ApplicationScope = () => {
     status: '-1',
     uniqueId: '',
   })
-  
-    useEffect(() => {
-      getAllAppScopes(currentPage, pageSize)
-    }, [currentPage])
+
+  useEffect(() => {
+    getAllAppScopes(currentPage, pageSize)
+  }, [currentPage])
 
   const getAllAppScopes = async (currentPage, pageSize) => {
     try {

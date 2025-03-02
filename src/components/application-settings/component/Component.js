@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -18,36 +18,185 @@ import {
   CTableDataCell,
   CTableRow,
 } from '@coreui/react'
+import Swal from 'sweetalert2'
+import { getAll as getAllModules, getByUUID } from '../../../service/module/ModuleService'
+import { getAll as getAppScopes } from '../../../service/application-scope/ApplicationScopeService'
+import { createOrUpdate, getAllWithPagination } from '../../../service/component/ComponentService'
+import Pagination from '../../UI/pagination/Pagination'
 
 function Component() {
+  // dynamic form fields
+  const [formComponents, setFormComponents] = useState([{ id: 1 }])
+  const [formComponentFields, setFormComponentFiedls] = useState([])
+
+  // page response
+  const [totalPages, setTotalPages] = useState()
+  const [currentPage, setCurrentPage] = useState(0)
+  const [components, setComponents] = useState([])
+  const pageSize = 10
+
   const [validated, setValidated] = useState(false)
-  const [formFields, setFormFields] = useState([{ id: 1 }])
+  const [modules, setModules] = useState([])
+  const [appScopes, setAppScopes] = useState([])
+  const [formData, setFormData] = useState({
+    applicationScope: '-1',
+    module: null,
+    components: [],
+  })
 
+  useEffect(() => {
+    getScopes()
+  }, [])
+
+  useEffect(() => {
+    getAllComponents(currentPage, pageSize)
+  }, [currentPage])
+
+  // ( + ) => Adding component fields
   const handleAddFields = () => {
-    setFormFields([...formFields, { id: Date.now() }])
+    setFormComponents((prevFields) => {
+      const lengthOfArr = prevFields.length
+      const updatedFields = [...prevFields]
+      const lastFieldId = updatedFields[lengthOfArr - 1].id + 1
+      updatedFields[lengthOfArr] = { ...updatedFields[lengthOfArr], ['id']: lastFieldId }
+      return updatedFields
+    })
   }
 
+  // ( - ) => Removing component fields
   const handleRemoveFields = (id) => {
-    setFormFields(formFields.filter((field) => field.id !== id))
+    setFormComponents(formComponents.filter((field) => field.id !== id))
+    const moduleArrayIndex = id - 1
+    setFormComponentFiedls((prevFields) => {
+      let updatedFields = [...prevFields]
+      updatedFields = updatedFields.filter((_, index) => index !== moduleArrayIndex)
+      return updatedFields
+    })
   }
 
-  const handleSubmit = (event) => {
+  // Setting array of components
+  const handleChangeComponentArray = (id, field, value) => {
+    const componentArrayIndex = id - 1
+    setFormComponentFiedls((prevFields) => {
+      const updatedObjects = [...prevFields]
+      updatedObjects[componentArrayIndex] = {
+        ...updatedObjects[componentArrayIndex],
+        [field]: value,
+      }
+      return updatedObjects
+    })
+  }
+
+  const getModulesByAppScope = async (uuid) => {
+    try {
+      const data = await getByUUID(uuid)
+      if (data.data.status === 'OK') {
+        setModules(data.data.data)
+      } else {
+        setModules([])
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error(
+        'Error occuring while calling user service to fetch all modules by uuid. ',
+        error,
+      )
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Modules fetching by uuid failed.',
+      })
+      setModules([])
+    }
+  }
+
+  const getScopes = async () => {
+    try {
+      const data = await getAppScopes()
+      if (data.status === 'OK') {
+        setAppScopes(data.data)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch all app scopes. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Application scopes fetching failed.',
+      })
+    }
+  }
+
+  const getAllComponents = async (currentPage, pageSize) => {
+    try {
+      const data = await getAllWithPagination(currentPage, pageSize)
+      if (data.data.status == 'OK') {
+        setComponents(data.data.data.dataList)
+        setTotalPages(data.data.data.totalPages)
+        setCurrentPage(data.data.data.currentPage)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch all components. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Components fetching failed.',
+      })
+    }
+  }
+
+  const handleSubmit = async (event) => {
     const form = event.currentTarget
     if (form.checkValidity() === false) {
       event.preventDefault()
       event.stopPropagation()
-    }
-
-    const selects = form.querySelectorAll('select')
-    selects.forEach((select) => {
-      if (select.value === '-1') {
-        select.setCustomValidity('Please select an option.')
-      } else {
-        select.setCustomValidity('')
+      setValidated(true)
+    } else {
+      const updatedForm = { ...formData }
+      updatedForm.components = formComponentFields
+      try {
+        const data = await createOrUpdate(updatedForm)
+        if (data.status == 'OK') {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: data.message,
+          })
+        }
+      } catch (error) {
+        console.error('Error occuring while creating components. ', error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.response.data.details[1],
+        })
       }
-    })
-    setValidated(true)
+    }
   }
+
+  const handleFormChange = (e) => {
+    const { id, value } = e.target
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }))
+  }
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -64,8 +213,21 @@ function Component() {
             >
               <CCol sm={4}>
                 <CFormLabel>Application Scope</CFormLabel>
-                <CFormSelect style={{ cursor: 'pointer' }} required>
+                <CFormSelect
+                  style={{ cursor: 'pointer' }}
+                  id="applicationScope"
+                  onChange={(e) => {
+                    handleFormChange(e)
+                    getModulesByAppScope(e.target.value)
+                  }}
+                  required
+                >
                   <option value="-1">Select an application scope</option>
+                  {appScopes.map((scope) => (
+                    <option key={scope.uniqueId} value={scope.uniqueId}>
+                      {scope.scope}
+                    </option>
+                  ))}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select an application scope.
@@ -73,8 +235,18 @@ function Component() {
               </CCol>
               <CCol sm={4}>
                 <CFormLabel>Module</CFormLabel>
-                <CFormSelect style={{ cursor: 'pointer' }} required>
+                <CFormSelect
+                  style={{ cursor: 'pointer' }}
+                  id="module"
+                  onChange={handleFormChange}
+                  required
+                >
                   <option value="-1">Select a module</option>
+                  {modules.map((module) => (
+                    <option key={module.id} value={module.id}>
+                      {module.module}
+                    </option>
+                  ))}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select a module.
@@ -94,12 +266,16 @@ function Component() {
               </CCol>
               <CCol sm={1}></CCol>
 
-              {formFields.map((field) => (
+              {formComponents.map((field) => (
                 <React.Fragment key={field.id}>
                   <CCol sm={3}>
                     <CFormInput
                       htmlFor={`specificSizeInputName-${field.id}`}
                       placeholder="Key name"
+                      id={`key_${field.id}`}
+                      onChange={(e) => {
+                        handleChangeComponentArray(field.id, 'key', e.target.value)
+                      }}
                       required
                     />
                     <CFormFeedback tooltip invalid>
@@ -110,6 +286,10 @@ function Component() {
                     <CFormInput
                       htmlFor={`specificSizeInputName-${field.id}`}
                       placeholder="Component Name"
+                      id={`name_${field.id}`}
+                      onChange={(e) => {
+                        handleChangeComponentArray(field.id, 'name', e.target.value)
+                      }}
                       required
                     />
                     <CFormFeedback tooltip invalid>
@@ -120,6 +300,10 @@ function Component() {
                     <CFormSelect
                       htmlFor={`specificSizeInputName-${field.id}`}
                       style={{ cursor: 'pointer' }}
+                      id={`status_${field.id}`}
+                      onChange={(e) => {
+                        handleChangeComponentArray(field.id, 'status', e.target.value)
+                      }}
                       required
                     >
                       <option value="-1">Select a status</option>
@@ -172,6 +356,7 @@ function Component() {
         <CTable>
           <CTableHead color="dark">
             <CTableRow>
+              <CTableHeaderCell scope="col">No</CTableHeaderCell>
               <CTableHeaderCell scope="col">Application Scope</CTableHeaderCell>
               <CTableHeaderCell scope="col">Module</CTableHeaderCell>
               <CTableHeaderCell scope="col">Key</CTableHeaderCell>
@@ -181,24 +366,34 @@ function Component() {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            <CTableRow>
-              <CTableDataCell>Mark</CTableDataCell>
-              <CTableDataCell>Mark</CTableDataCell>
-              <CTableDataCell>Otto</CTableDataCell>
-              <CTableDataCell>Otto</CTableDataCell>
-              <CTableDataCell>@mdo</CTableDataCell>
-              <CTableDataCell>
-                <CButton type="button" className="btn btn-primary btn-sm">
-                  <span style={{ color: 'white' }}>Edit</span>
-                </CButton>{' '}
-                &nbsp;
-                <CButton type="button" className="btn btn-danger btn-sm">
-                  <span style={{ color: 'white' }}>Delete</span>
-                </CButton>{' '}
-              </CTableDataCell>
-            </CTableRow>
+            {components.map((component, index) => (
+              <React.Fragment key={component.componentId}>
+                <CTableRow>
+                  <CTableDataCell>{index + 1}</CTableDataCell>
+                  <CTableDataCell>{component.applicationScope}</CTableDataCell>
+                  <CTableDataCell>{component.module}</CTableDataCell>
+                  <CTableDataCell>{component.key}</CTableDataCell>
+                  <CTableDataCell>{component.name}</CTableDataCell>
+                  <CTableDataCell>{component.status}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton type="button" className="btn btn-primary btn-sm">
+                      <span style={{ color: 'white' }}>Edit</span>
+                    </CButton>{' '}
+                    &nbsp;
+                    <CButton type="button" className="btn btn-danger btn-sm">
+                      <span style={{ color: 'white' }}>Delete</span>
+                    </CButton>{' '}
+                  </CTableDataCell>
+                </CTableRow>
+              </React.Fragment>
+            ))}
           </CTableBody>
         </CTable>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </CCol>
     </CRow>
   )
