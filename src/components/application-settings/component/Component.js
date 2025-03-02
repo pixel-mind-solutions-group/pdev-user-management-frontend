@@ -27,7 +27,7 @@ import Pagination from '../../UI/pagination/Pagination'
 function Component() {
   // dynamic form fields
   const [formComponents, setFormComponents] = useState([{ id: 1 }])
-  const [formComponentFields, setFormComponentFiedls] = useState([])
+  const [formComponentFields, setFormComponentFields] = useState([])
 
   // page response
   const [totalPages, setTotalPages] = useState()
@@ -67,7 +67,7 @@ function Component() {
   const handleRemoveFields = (id) => {
     setFormComponents(formComponents.filter((field) => field.id !== id))
     const moduleArrayIndex = id - 1
-    setFormComponentFiedls((prevFields) => {
+    setFormComponentFields((prevFields) => {
       let updatedFields = [...prevFields]
       updatedFields = updatedFields.filter((_, index) => index !== moduleArrayIndex)
       return updatedFields
@@ -77,7 +77,7 @@ function Component() {
   // Setting array of components
   const handleChangeComponentArray = (id, field, value) => {
     const componentArrayIndex = id - 1
-    setFormComponentFiedls((prevFields) => {
+    setFormComponentFields((prevFields) => {
       const updatedObjects = [...prevFields]
       updatedObjects[componentArrayIndex] = {
         ...updatedObjects[componentArrayIndex],
