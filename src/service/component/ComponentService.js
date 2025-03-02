@@ -38,3 +38,17 @@ export const getAllWithPagination = (currentPage, size) => {
     throw error
   }
 }
+
+export const getComponentsByScopeAndModule = (scope, module) => {
+  try {
+    const response = axios.get(`${COMPONENT_API_URL}/get-by-scope-and-module`, {
+      params: {
+        scope: scope,
+        module: module,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}

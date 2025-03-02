@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -18,36 +18,117 @@ import {
   CTableHeaderCell,
   CTableHead,
 } from '@coreui/react'
+import { getAll as getAppScopes } from '../../../service/application-scope/ApplicationScopeService'
+import { getByUUID } from '../../../service/module/ModuleService'
+import { getComponentsByScopeAndModule } from '../../../service/component/ComponentService'
+import Swal from 'sweetalert2'
 
 function ComponentElement() {
   const [validated, setValidated] = useState(false)
   const [formFields, setFormFields] = useState([{ id: 1 }])
 
-  const handleFormFields = () => {
-    setFormFields([...formFields, { id: Date.now() }])
-  }
+  const [components, setComponents] = useState([])
+  const [modules, setModules] = useState([])
+  const [appScopes, setAppScopes] = useState([])
+  const [selectedAppScope, setSelectedAppScope] = useState('-1')
+  const [selectedModule, setSelectedModule] = useState('-1')
 
-  const handleRemoveFields = (id) => {
-    setFormFields(formFields.filter((field) => field.id !== id))
-  }
+  const handleFormFields = () => {}
 
-  const handleSubmit = (event) => {
-    const form = event.currentTarget
-    if (form.checkValidity() === false) {
-      event.preventDefault()
-      event.stopPropagation()
-    }
+  const handleRemoveFields = (id) => {}
 
-    const selects = form.querySelectorAll('select')
-    selects.forEach((select) => {
-      if (select.value === '-1') {
-        select.setCustomValidity('Please select an option.')
+  useEffect(() => {
+    getScopes()
+  }, [])
+
+  const getScopes = async () => {
+    try {
+      const data = await getAppScopes()
+      if (data.status === 'OK') {
+        setAppScopes(data.data)
       } else {
-        select.setCustomValidity('')
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message,
+        })
       }
-    })
-    setValidated(true)
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch all app scopes. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Application scopes fetching failed.',
+      })
+    }
   }
+
+  const getModulesByAppScope = async (uuid) => {
+    try {
+      const data = await getByUUID(uuid)
+      if (data.data.status === 'OK') {
+        setModules(data.data.data)
+      } else {
+        setModules([])
+        setComponents([])
+        console.warn(data.data.message)
+      }
+    } catch (error) {
+      console.error(
+        'Error occuring while calling user service to fetch all modules by uuid. ',
+        error,
+      )
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Modules fetching by uuid failed.',
+      })
+      setModules([])
+      setComponents([])
+    }
+  }
+
+  const appScopeChange = (event) => {
+    setSelectedAppScope(event.target.value)
+  }
+
+  const moduleChange = (event) => {
+    setSelectedModule(event.target.value)
+  }
+
+  useEffect(() => {
+    getComponentsByAppScopeAndModule()
+  }, [selectedAppScope, selectedModule])
+
+  const getComponentsByAppScopeAndModule = async () => {
+    if (selectedAppScope !== '-1' && selectedModule !== '-1') {
+      try {
+        const data = await getComponentsByScopeAndModule(selectedAppScope, selectedModule)
+        if (data.data.status === 'OK') {
+          setComponents(data.data.data)
+        } else {
+          setComponents([])
+          console.warn(data.data.message)
+        }
+      } catch (error) {
+        console.error(
+          'Error occuring while calling user service to fetch all components by app scope and module. ',
+          error,
+        )
+        Swal.fire({
+          icon: 'error',
+          title: 'Internal Server Error',
+          text: 'Components fetching by app scope and module failed.',
+        })
+        setComponents([])
+      }
+    } else {
+      setComponents([])
+    }
+  }
+
+  const handleSubmit = (event) => {}
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -64,8 +145,21 @@ function ComponentElement() {
             >
               <CCol sm={4}>
                 <CFormLabel>Application Scope</CFormLabel>
-                <CFormSelect style={{ cursor: 'pointer' }} required>
+                <CFormSelect
+                  style={{ cursor: 'pointer' }}
+                  id="applicationScope"
+                  onChange={(e) => {
+                    getModulesByAppScope(e.target.value)
+                    appScopeChange(e)
+                  }}
+                  required
+                >
                   <option value="-1">Select an application scope</option>
+                  {appScopes.map((scope) => (
+                    <option key={scope.uniqueId} value={scope.uniqueId}>
+                      {scope.scope}
+                    </option>
+                  ))}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select an application scope.
@@ -73,8 +167,20 @@ function ComponentElement() {
               </CCol>
               <CCol sm={4}>
                 <CFormLabel>Module</CFormLabel>
-                <CFormSelect style={{ cursor: 'pointer' }} required>
+                <CFormSelect
+                  style={{ cursor: 'pointer' }}
+                  onChange={(e) => {
+                    moduleChange(e)
+                  }}
+                  id="module"
+                  required
+                >
                   <option value="-1">Select a module</option>
+                  {modules.map((module) => (
+                    <option key={module.id} value={module.id}>
+                      {module.module}
+                    </option>
+                  ))}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select a module.
@@ -84,6 +190,11 @@ function ComponentElement() {
                 <CFormLabel>Component</CFormLabel>
                 <CFormSelect style={{ cursor: 'pointer' }} required>
                   <option value="-1">Select a component</option>
+                  {components.map((c) => (
+                    <option key={c.componentId} value={c.componentId}>
+                      {c.name}
+                    </option>
+                  ))}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select a component.
