@@ -169,11 +169,14 @@ const ApplicationScope = () => {
                   Please select a status.
                 </CFormFeedback>
               </CCol>
-              <CCol xs="auto" style={{ marginTop: '40px' }}>
-                <CButton color="primary" type="submit">
-                  Create
-                </CButton>
-              </CCol>
+              <div className="w-100"></div>
+              <CRow className="justify-content-end">
+                <CCol xs="auto" style={{ marginTop: '30px' }}>
+                  <CButton color="primary" type="submit">
+                    Create
+                  </CButton>
+                </CCol>
+              </CRow>
             </CForm>
           </CCardBody>
         </CCard>
