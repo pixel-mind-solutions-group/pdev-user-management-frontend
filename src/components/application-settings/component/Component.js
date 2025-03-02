@@ -179,7 +179,7 @@ function Component() {
           })
         }
       } catch (error) {
-        console.error('Error occuring while creating components. ', error)
+        console.error('Error occuring while creating component elements. ', error)
         Swal.fire({
           icon: 'error',
           title: 'Error',
