@@ -43,7 +43,7 @@ function AuthParty() {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Manage Authorize Parties</strong>
+            <strong>Manage Authorize Party</strong>
           </CCardHeader>
           <CCardBody>
             <CForm
