@@ -177,6 +177,7 @@ function Component() {
             title: 'Success',
             text: data.message,
           })
+          getAllWithPagination(currentPage, pageSize)
         }
       } catch (error) {
         console.error('Error occuring while creating component elements. ', error)

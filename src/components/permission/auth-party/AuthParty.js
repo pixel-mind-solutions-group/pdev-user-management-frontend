@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -18,25 +18,92 @@ import {
   CTableHeaderCell,
   CTableHead,
 } from '@coreui/react'
+import Swal from 'sweetalert2'
+import {
+  createOrUpdate,
+  getAll,
+  getAllWithPagination,
+  getById,
+  deleteById,
+} from '../../../service/permission/auth-party/AuthPartyService'
+import Pagination from '../../UI/pagination/Pagination'
 
 function AuthParty() {
   const [validated, setValidated] = useState(false)
-  const handleSubmit = (event) => {
+  const [formData, setFormData] = useState({
+    party: null,
+    status: '-1',
+  })
+
+  // page response
+  const [totalPages, setTotalPages] = useState()
+  const [currentPage, setCurrentPage] = useState(0)
+  const [authParties, setAuthParties] = useState([])
+  const pageSize = 10
+
+  const handleSubmit = async (event) => {
     const form = event.currentTarget
     if (form.checkValidity() === false) {
       event.preventDefault()
       event.stopPropagation()
-    }
-
-    const selects = form.querySelectorAll('select')
-    selects.forEach((select) => {
-      if (select.value === '-1') {
-        select.setCustomValidity('Please select an option.')
-      } else {
-        select.setCustomValidity('')
+      setValidated(true)
+    } else {
+      const updatedForm = { ...formData }
+      try {
+        const data = await createOrUpdate(updatedForm)
+        if (data.status == 'OK') {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: data.message,
+          })
+          getAllAuthParties(currentPage, pageSize)
+        }
+      } catch (error) {
+        console.error('Error occuring while creating auth party. ', error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.response.data.details[1],
+        })
       }
-    })
-    setValidated(true)
+    }
+  }
+
+  const handleFormChange = (e) => {
+    const { id, value } = e.target
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }))
+  }
+
+  useEffect(() => {
+    getAllAuthParties(currentPage, pageSize)
+  }, [currentPage])
+
+  const getAllAuthParties = async (currentPage, pageSize) => {
+    try {
+      const data = await getAllWithPagination(currentPage, pageSize)
+      if (data.data.status === 'OK') {
+        setAuthParties(data.data.data.dataList)
+        setTotalPages(data.data.data.totalPages)
+        setCurrentPage(data.data.data.currentPage)
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occured, while fetching all auth parties.')
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Auth parties fetching failed.',
+      })
+    }
   }
   return (
     <CRow>
@@ -53,15 +120,29 @@ function AuthParty() {
               onSubmit={handleSubmit}
             >
               <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeInputName">Party</CFormLabel>
-                <CFormInput id="specificSizeInputName" placeholder="Party" required />
+                <CFormLabel htmlFor="party">Party</CFormLabel>
+                <CFormInput
+                  id="party"
+                  placeholder="Party"
+                  required
+                  onChange={(e) => {
+                    handleFormChange(e)
+                  }}
+                />
                 <CFormFeedback tooltip invalid>
                   Please provide a party.
                 </CFormFeedback>
               </CCol>
               <CCol sm={4}>
-                <CFormLabel htmlFor="specificSizeSelect">Status</CFormLabel>
-                <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
+                <CFormLabel htmlFor="status">Status</CFormLabel>
+                <CFormSelect
+                  id="status"
+                  style={{ cursor: 'pointer' }}
+                  required
+                  onChange={(e) => {
+                    handleFormChange(e)
+                  }}
+                >
                   <option value="-1">Select a status</option>
                   <option value="Active">Active</option>
                   <option value="In_active">In-active</option>
@@ -83,17 +164,38 @@ function AuthParty() {
         <CTable>
           <CTableHead color="dark">
             <CTableRow>
+              <CTableHeaderCell scope="col">No</CTableHeaderCell>
               <CTableHeaderCell scope="col">Name</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Action</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            <CTableRow>
-              <CTableDataCell>Mark</CTableDataCell>
-              <CTableDataCell>@mdo</CTableDataCell>
-            </CTableRow>
+            {authParties.map((a, index) => (
+              <React.Fragment key={a.authorizePartyId}>
+                <CTableRow>
+                  <CTableDataCell>{index + 1}</CTableDataCell>
+                  <CTableDataCell>{a.party}</CTableDataCell>
+                  <CTableDataCell>{a.status}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton type="button" className="btn btn-primary btn-sm">
+                      <span style={{ color: 'white' }}>Edit</span>
+                    </CButton>{' '}
+                    &nbsp;
+                    <CButton type="button" className="btn btn-danger btn-sm">
+                      <span style={{ color: 'white' }}>Delete</span>
+                    </CButton>{' '}
+                  </CTableDataCell>
+                </CTableRow>
+              </React.Fragment>
+            ))}
           </CTableBody>
         </CTable>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </CCol>
     </CRow>
   )
