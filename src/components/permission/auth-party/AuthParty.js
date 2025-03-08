@@ -21,7 +21,6 @@ import {
 import Swal from 'sweetalert2'
 import {
   createOrUpdate,
-  getAll,
   getAllWithPagination,
   getById,
   deleteById,
