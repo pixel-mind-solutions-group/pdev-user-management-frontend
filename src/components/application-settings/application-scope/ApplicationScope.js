@@ -24,6 +24,8 @@ import {
 import {
   getAllWithPagination,
   createOrUpdate,
+  getById,
+  deleteById,
 } from '../../../service/application-scope/ApplicationScopeService'
 import Pagination from '../../UI/pagination/Pagination'
 
@@ -45,6 +47,69 @@ const ApplicationScope = () => {
   useEffect(() => {
     getAllAppScopes(currentPage, pageSize)
   }, [currentPage])
+
+  const getScopeById = async (id) => {
+    try {
+      const data = await getById(id)
+      if (data.status == 'OK') {
+        setFormData((prevData) => ({
+          ...prevData,
+          applicationScopeId: data.data.applicationScopeId,
+          scope: data.data.scope,
+          status: data.data.status,
+          uniqueId: data.data.uniqueId,
+        }))
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch scope by id. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Application scope fetching failed.',
+      })
+    }
+  }
+
+  const deleteScopeById = async (id) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Do you want to delete?',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Don't delete`,
+      })
+
+      if (result.isConfirmed) {
+        const data = await deleteById(id)
+        if (data.status === 'OK') {
+          Swal.fire('Deleted!', '', 'success')
+          getAllAppScopes(currentPage, pageSize)
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message,
+          })
+        }
+      } else if (result.isDenied) {
+        Swal.fire('Changes are not saved', '', 'info')
+      }
+    } catch (error) {
+      console.error('Error occurred while calling user service to delete scope by id.', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Application scope deleting failed.',
+      })
+    }
+  }
 
   const getAllAppScopes = async (currentPage, pageSize) => {
     try {
@@ -201,11 +266,23 @@ const ApplicationScope = () => {
                   <CTableDataCell>{scope.uniqueId}</CTableDataCell>
                   <CTableDataCell>{scope.status}</CTableDataCell>
                   <CTableDataCell>
-                    <CButton type="button" className="btn btn-primary btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => {
+                        getScopeById(scope.applicationScopeId)
+                      }}
+                    >
                       <span style={{ color: 'white' }}>Edit</span>
                     </CButton>{' '}
                     &nbsp;
-                    <CButton type="button" className="btn btn-danger btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={() => {
+                        deleteScopeById(scope.applicationScopeId)
+                      }}
+                    >
                       <span style={{ color: 'white' }}>Delete</span>
                     </CButton>{' '}
                   </CTableDataCell>
