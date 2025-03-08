@@ -15,7 +15,7 @@ export const createOrUpdate = async (data) => {
   }
 }
 
-export const getAll = () => {
+export const getAllAuthParties = () => {
   try {
     const response = axios.get(`${COMPONENT_API_URL}/get-all`)
     return response

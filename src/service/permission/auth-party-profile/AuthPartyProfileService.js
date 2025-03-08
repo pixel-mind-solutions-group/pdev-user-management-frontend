@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { environment } from '../../../environments/environment'
-const COMPONENT_API_URL = `${environment.baseUrl}` + '/authorize-party-role/v1'
+const COMPONENT_API_URL = `${environment.baseUrl}` + '/authorize-party-profile/v1'
 
 export const createOrUpdate = async (data) => {
   try {
@@ -15,7 +15,7 @@ export const createOrUpdate = async (data) => {
   }
 }
 
-export const getAllAuthRoles = () => {
+export const getAll = () => {
   try {
     const response = axios.get(`${COMPONENT_API_URL}/get-all`)
     return response
@@ -24,9 +24,9 @@ export const getAllAuthRoles = () => {
   }
 }
 
-export const getById = (id) => {
+export const getAuthProfileByAuthPartyId = (id) => {
   try {
-    const response = axios.get(`${COMPONENT_API_URL}/get-by-id`, {
+    const response = axios.get(`${COMPONENT_API_URL}/get-by-auth-party`, {
       params: {
         id: id,
       },
