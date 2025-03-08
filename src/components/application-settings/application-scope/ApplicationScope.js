@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useEffect, useState, useRef } from 'react'
 import Swal from 'sweetalert2'
 import {
