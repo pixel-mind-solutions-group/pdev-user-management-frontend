@@ -20,8 +20,13 @@ import {
 } from '@coreui/react'
 import Pagination from '../../UI/pagination/Pagination'
 import Swal from 'sweetalert2'
-import { getAllWithPagination, createOrUpdate } from '../../../service/module/ModuleService'
+import {
+  getAllWithPagination,
+  createOrUpdate,
+  getModuleById,
+} from '../../../service/module/ModuleService'
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
+import { set } from 'core-js/core/dict'
 
 const Module = () => {
   // dynamic form fields
@@ -40,6 +45,14 @@ const Module = () => {
     applicationScope: '-1',
     modules: [],
   })
+
+  useEffect(() => {
+    getAllScopse()
+  }, [])
+
+  useEffect(() => {
+    getAllModules(currentPage, pageSize)
+  }, [currentPage])
 
   // ( + ) => Adding module fields
   const handleAddFields = () => {
@@ -72,14 +85,6 @@ const Module = () => {
       return updatedObjects
     })
   }
-
-  useEffect(() => {
-    getAllScopse()
-  }, [])
-
-  useEffect(() => {
-    getAllModules(currentPage, pageSize)
-  }, [currentPage])
 
   const handleSubmit = async (event) => {
     const form = event.currentTarget
@@ -169,6 +174,27 @@ const Module = () => {
       ...prevData,
       [id]: value,
     }))
+  }
+
+  const handleEditModule = async (id) => {
+    try {
+      const data = await getModuleById(id)
+      if (data.status == 'OK') {
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch module. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Module fetching failed.',
+      })
+    }
   }
 
   return (

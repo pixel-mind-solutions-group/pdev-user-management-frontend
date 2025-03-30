@@ -51,3 +51,16 @@ export const createOrUpdate = async (data) => {
     throw error
   }
 }
+
+export const getModuleById = (id) => {
+  try {
+    const response = axios.get(`${MODULE_API_URL}/get-by-id`, {
+      params: {
+        id: id,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}
