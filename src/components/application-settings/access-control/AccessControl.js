@@ -43,6 +43,33 @@ function AccessControl() {
     })
     setValidated(true)
   }
+
+  /* 
+          const [modules, setModules] = useState([]) -> array of modules ids  -> ex: 1, 2, 3, 4...
+  
+          const [selectedModules, setSelectedModules] = useState([]) -> array of selected modules ids  -> ex: 1, 2, 4
+  
+          const [components, setComponents] = useState([]) -> array of components related to selected modules ids
+            ex: new Map([
+              [1 => [(101), 102, 103],         module id 1 -> components ids (101, 102, 103)
+              [2 => [201, (202), 203],         module id 2 -> components ids (201, 202, 202)
+              [4 => [(401), 403, 404],         module id 3 -> components ids (401, 403, 404)
+            ])                                                    
+  
+          const [selectedComponents, setSelectedComponents] = useState([]) -> array of selected components ids -> ex: 101, 202, 401
+  
+          const [componentElements, setComponentElements] = useState([]) -> array of component elements related to selected components ids
+            ex: new Map([
+              [101 => [(1011), 1022, 1033],         component id 101 -> comp-element ids (1011, 1022, 1033)
+              [202 => [2011, (2022), 2033],         component id 202 -> comp-element ids (2011, 2022, 2033)
+              [401 => [(4011), 4033, 4044],         component id 401 -> comp-element ids (4011, 4033, 4044)
+            ])    
+  
+          const [selectedComponentElements, setSelectedComponentElements] = useState([]) -> array of selected component elements ids -> ex: 1011, 2022, 4011
+          
+          IDS should be objects...  ex: <obj, [abj1, obj2, obj3]>
+      
+  */
   return (
     <CRow>
       <CCol xs={12}>
