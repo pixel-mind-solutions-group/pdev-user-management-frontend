@@ -24,9 +24,9 @@ import {
   getAllWithPagination,
   createOrUpdate,
   getModuleById,
+  deleteModuleById,
 } from '../../../service/module/ModuleService'
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
-import { set } from 'core-js/core/dict'
 
 const Module = () => {
   // dynamic form fields
@@ -39,9 +39,11 @@ const Module = () => {
   const [modules, setModules] = useState([])
   const pageSize = 10
 
+  const [editable, setEditable] = useState(false)
   const [validated, setValidated] = useState(false)
   const [applicationScopes, setApplicationScopes] = useState([])
   const [formData, setFormData] = useState({
+    id: '',
     applicationScope: '-1',
     modules: [],
   })
@@ -94,6 +96,9 @@ const Module = () => {
       setValidated(true)
     } else {
       const updatedForm = { ...formData }
+      updatedForm.key = formModuleFields[0].key
+      updatedForm.module = formModuleFields[0].module
+      updatedForm.status = formModuleFields[0].status
       updatedForm.modules = formModuleFields
       try {
         const data = await createOrUpdate(updatedForm)
@@ -104,6 +109,7 @@ const Module = () => {
             text: data.message,
           })
           getAllModules(currentPage, pageSize)
+          handleReset()
         } else {
           Swal.fire({
             icon: 'error',
@@ -179,12 +185,26 @@ const Module = () => {
   const handleEditModule = async (id) => {
     try {
       const data = await getModuleById(id)
-      if (data.status == 'OK') {
+      if (data.data.status == 'OK') {
+        const module = data.data.data
+        setFormModuleFiedls((prevFields) => {
+          const updatedObjects = [...prevFields]
+          updatedObjects[0] = { ...updatedObjects[0], ['key']: module.key }
+          updatedObjects[0] = { ...updatedObjects[0], ['module']: module.module }
+          updatedObjects[0] = { ...updatedObjects[0], ['status']: module.status }
+          return updatedObjects
+        })
+        setFormData((prevData) => ({
+          ...prevData,
+          id: module.id,
+          applicationScope: module.applicationScope,
+        }))
+        setEditable(true)
       } else {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: data.message,
+          text: data.data.message,
         })
       }
     } catch (error) {
@@ -193,6 +213,53 @@ const Module = () => {
         icon: 'error',
         title: 'Internal Server Error',
         text: 'Module fetching failed.',
+      })
+    }
+  }
+
+  const handleReset = () => {
+    setEditable(false)
+    setFormModuleFiedls([])
+    setFormModules([{ id: 1 }])
+    setFormData((prevData) => ({
+      ...prevData,
+      id: '',
+      applicationScope: '-1',
+      modules: [],
+    }))
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Do you want to delete?',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Don't delete`,
+      })
+      if (result.isConfirmed) {
+        const data = await deleteModuleById(id)
+        if (data.data.status === 'OK') {
+          Swal.fire('Deleted!', '', 'success')
+          getAllModules(currentPage, pageSize)
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.data.message,
+          })
+        }
+        handleReset()
+      } else if (result.isDenied) {
+        Swal.fire('Changes are not saved', '', 'info')
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to delete module. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Module deleting failed.',
       })
     }
   }
@@ -214,6 +281,7 @@ const Module = () => {
               <CCol sm={4}>
                 <CFormLabel htmlFor="applicationScope">Application Scope</CFormLabel>
                 <CFormSelect
+                  value={formData.applicationScope}
                   id="applicationScope"
                   style={{ cursor: 'pointer' }}
                   required
@@ -231,7 +299,7 @@ const Module = () => {
                 </CFormFeedback>
               </CCol>
 
-              <div className="w-100"></div>
+              <div className="w-100" id="id" value={formData.id}></div>
 
               <React.Fragment>
                 <CCol sm={3}>
@@ -251,6 +319,7 @@ const Module = () => {
                   <CCol sm={3}>
                     <CFormInput
                       id={`key_${field.id}`}
+                      value={formModuleFields[field.id - 1]?.key || ''}
                       placeholder="Key name"
                       onChange={(e) => {
                         handleChangeModuleArray(field.id, 'key', e.target.value)
@@ -264,6 +333,7 @@ const Module = () => {
                   <CCol sm={3}>
                     <CFormInput
                       id={`module_${field.id}`}
+                      value={formModuleFields[field.id - 1]?.module || ''}
                       placeholder="Module name"
                       onChange={(e) => {
                         handleChangeModuleArray(field.id, 'module', e.target.value)
@@ -276,6 +346,7 @@ const Module = () => {
                   </CCol>
                   <CCol sm={3}>
                     <CFormSelect
+                      value={formModuleFields[field.id - 1]?.status || ''}
                       id={`status_${field.id}`}
                       style={{ cursor: 'pointer' }}
                       onChange={(e) => {
@@ -321,7 +392,16 @@ const Module = () => {
               <CRow className="justify-content-end">
                 <CCol xs="auto" style={{ marginTop: '30px' }}>
                   <CButton color="primary" type="submit">
-                    Create
+                    {(editable && 'Update') || 'Create'}
+                  </CButton>{' '}
+                  &nbsp;
+                  <CButton
+                    color="success"
+                    type="reset"
+                    style={{ color: 'white' }}
+                    onClick={() => handleReset()}
+                  >
+                    Reset
                   </CButton>
                 </CCol>
               </CRow>
@@ -351,11 +431,19 @@ const Module = () => {
                   <CTableDataCell>{module.key}</CTableDataCell>
                   <CTableDataCell>{module.status}</CTableDataCell>
                   <CTableDataCell>
-                    <CButton type="button" className="btn btn-primary btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => handleEditModule(module.id)}
+                    >
                       <span style={{ color: 'white' }}>Edit</span>
                     </CButton>{' '}
                     &nbsp;
-                    <CButton type="button" className="btn btn-danger btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(module.id)}
+                    >
                       <span style={{ color: 'white' }}>Delete</span>
                     </CButton>{' '}
                   </CTableDataCell>

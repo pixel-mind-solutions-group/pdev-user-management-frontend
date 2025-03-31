@@ -64,3 +64,16 @@ export const getModuleById = (id) => {
     throw error
   }
 }
+
+export const deleteModuleById = (id) => {
+  try {
+    const response = axios.delete(`${MODULE_API_URL}/delete-by-id`, {
+      params: {
+        id: id,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}
