@@ -52,3 +52,29 @@ export const getComponentsByScopeAndModule = (scope, module) => {
     throw error
   }
 }
+
+export const getComponentById = (id) => {
+  try {
+    const response = axios.get(`${COMPONENT_API_URL}/get-by-id`, {
+      params: {
+        id: id,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
+export const deleteComponentById = (id) => {
+  try {
+    const response = axios.delete(`${COMPONENT_API_URL}/delete-by-id`, {
+      params: {
+        id: id,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}

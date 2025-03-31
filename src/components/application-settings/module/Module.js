@@ -102,7 +102,7 @@ const Module = () => {
       updatedForm.modules = formModuleFields
       try {
         const data = await createOrUpdate(updatedForm)
-        if (data.status == 'OK') {
+        if (data.status === 'OK') {
           Swal.fire({
             icon: 'success',
             title: 'Success',
@@ -184,6 +184,7 @@ const Module = () => {
 
   const handleEditModule = async (id) => {
     try {
+      handleReset()
       const data = await getModuleById(id)
       if (data.data.status == 'OK') {
         const module = data.data.data
@@ -346,7 +347,7 @@ const Module = () => {
                   </CCol>
                   <CCol sm={3}>
                     <CFormSelect
-                      value={formModuleFields[field.id - 1]?.status || ''}
+                      value={formModuleFields[field.id - 1]?.status || '-1'}
                       id={`status_${field.id}`}
                       style={{ cursor: 'pointer' }}
                       onChange={(e) => {
@@ -363,7 +364,7 @@ const Module = () => {
                     </CFormFeedback>
                   </CCol>
                   <CCol sm={1}>
-                    <CCol xs="auto" style={{ marginTop: '0px' }}>
+                    <CCol xs="auto" style={{ display: editable ? 'none' : 'block' }}>
                       <CButton
                         type="button"
                         className="btn btn-danger btn-sm"
@@ -377,7 +378,7 @@ const Module = () => {
               ))}
 
               <CCol sm={1}>
-                <CCol xs="auto" style={{ marginTop: '0px' }}>
+                <CCol xs="auto" style={{ marginTop: '0px', display: editable ? 'none' : 'block' }}>
                   <CButton
                     type="button"
                     className="btn btn-success btn-sm"
