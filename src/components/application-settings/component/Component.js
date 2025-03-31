@@ -46,7 +46,7 @@ function Component() {
   const [appScopes, setAppScopes] = useState([])
   const [formData, setFormData] = useState({
     component: '',
-    applicationScope: '-1',
+    applicationScope: undefined,
     module: undefined,
     components: [],
   })
@@ -254,8 +254,8 @@ function Component() {
     setFormData((prevData) => ({
       ...prevData,
       component: '',
-      module: '-1',
-      applicationScope: '-1',
+      module: undefined,
+      applicationScope: undefined,
       components: [],
     }))
   }
@@ -428,9 +428,8 @@ function Component() {
                   </CCol>
                 </React.Fragment>
               ))}
-
-              <CCol sm={1}>
-                <CCol xs="auto" style={{ marginTop: '0px', display: editable ? 'none' : 'block' }}>
+              <CCol sm={1} style={{ display: editable ? 'none' : 'block' }}>
+                <CCol xs="auto" style={{ marginTop: '0px' }}>
                   <CButton
                     type="button"
                     className="btn btn-success btn-sm"

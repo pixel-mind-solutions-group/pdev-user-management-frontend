@@ -24,6 +24,8 @@ import { getComponentsByScopeAndModule } from '../../../service/component/Compon
 import {
   getAllWithPagination,
   createOrUpdate,
+  getComponentElementById,
+  deleteComponentElementById,
 } from '../../../service/component-element/ComponentElementService'
 import Swal from 'sweetalert2'
 import Pagination from '../../UI/pagination/Pagination'
@@ -39,6 +41,7 @@ function ComponentElement() {
   const [componentElements, setComponentElements] = useState([])
   const pageSize = 10
 
+  const [editable, setEditable] = useState(false)
   const [validated, setValidated] = useState(false)
   const [components, setComponents] = useState([])
   const [modules, setModules] = useState([])
@@ -46,9 +49,10 @@ function ComponentElement() {
   const [selectedAppScope, setSelectedAppScope] = useState('-1')
   const [selectedModule, setSelectedModule] = useState('-1')
   const [formData, setFormData] = useState({
-    applicationScope: null,
-    module: null,
-    component: null,
+    componentElementId: '',
+    applicationScope: undefined,
+    module: undefined,
+    component: undefined,
     componentElements: [],
   })
 
@@ -224,6 +228,9 @@ function ComponentElement() {
       setValidated(true)
     } else {
       const updatedForm = { ...formData }
+      updatedForm.key = formComponentElementFields[0].key
+      updatedForm.name = formComponentElementFields[0].name
+      updatedForm.status = formComponentElementFields[0].status
       updatedForm.componentElements = formComponentElementFields
       try {
         const data = await createOrUpdate(updatedForm)
@@ -233,6 +240,8 @@ function ComponentElement() {
             title: 'Success',
             text: data.data.message,
           })
+          getAllComponentElements(currentPage, pageSize)
+          handleReset()
         }
       } catch (error) {
         console.error('Error occuring while creating components. ', error)
@@ -242,6 +251,101 @@ function ComponentElement() {
           text: error.response.data.details[1],
         })
       }
+    }
+  }
+
+  const handleEditComponentElement = async (id) => {
+    try {
+      handleReset()
+      const data = await getComponentElementById(id)
+      if (data.data.status === 'OK') {
+        const componentElement = data.data.data
+        setFormComponentElementFieds((prevFields) => {
+          const updatedObjects = [...prevFields]
+          updatedObjects[0] = { ...updatedObjects[0], ['key']: componentElement.key }
+          updatedObjects[0] = { ...updatedObjects[0], ['name']: componentElement.name }
+          updatedObjects[0] = { ...updatedObjects[0], ['status']: componentElement.status }
+          return updatedObjects
+        })
+        getModulesByAppScope(componentElement.scope)
+        setSelectedAppScope(componentElement.scope)
+        setSelectedModule(componentElement.module)
+        getComponentsByAppScopeAndModule()
+        setFormData((prevData) => ({
+          ...prevData,
+          componentElementId: componentElement.componentElementId,
+          module: componentElement.module,
+          component: componentElement.component,
+          applicationScope: componentElement.scope,
+        }))
+        setEditable(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch component element. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Component element fetching failed.',
+      })
+    }
+  }
+
+  const handleReset = () => {
+    setEditable(false)
+    setFormComponentElementFieds([])
+    setFormComponentElements([{ id: 1 }])
+    setFormData((prevData) => ({
+      ...prevData,
+      componentElementId: '',
+      applicationScope: undefined,
+      module: undefined,
+      component: undefined,
+      componentElements: [],
+    }))
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Do you want to delete?',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Don't delete`,
+      })
+      if (result.isConfirmed) {
+        const data = await deleteComponentElementById(id)
+        if (data.data.status === 'OK') {
+          Swal.fire('Deleted!', '', 'success')
+          getAllComponentElements(currentPage, pageSize)
+          handleReset()
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.data.message,
+          })
+        }
+        handleReset()
+      } else if (result.isDenied) {
+        Swal.fire('Changes are not saved', '', 'info')
+      }
+    } catch (error) {
+      console.error(
+        'Error occuring while calling user service to delete component element. ',
+        error,
+      )
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Component element deleting failed.',
+      })
     }
   }
 
@@ -263,6 +367,7 @@ function ComponentElement() {
                 <CFormLabel>Application Scope</CFormLabel>
                 <CFormSelect
                   style={{ cursor: 'pointer' }}
+                  value={formData.applicationScope}
                   id="applicationScope"
                   onChange={(e) => {
                     handleFormChange(e)
@@ -290,6 +395,7 @@ function ComponentElement() {
                     handleFormChange(e)
                     moduleChange(e)
                   }}
+                  value={formData.module}
                   id="module"
                   required
                 >
@@ -310,6 +416,7 @@ function ComponentElement() {
                   style={{ cursor: 'pointer' }}
                   onChange={(e) => handleFormChange(e)}
                   id="component"
+                  value={formData.component}
                   required
                 >
                   <option value="-1">Select a component</option>
@@ -324,7 +431,11 @@ function ComponentElement() {
                 </CFormFeedback>
               </CCol>
 
-              <div className="w-100"></div>
+              <div
+                className="w-100"
+                id="componentElementId"
+                value={formData.componentElementId}
+              ></div>
 
               <CCol sm={3}>
                 <CFormLabel>Key Name</CFormLabel>
@@ -343,6 +454,7 @@ function ComponentElement() {
                     <CFormInput
                       placeholder="Key name"
                       id={`key_${field.id}`}
+                      value={formComponentElementFields[field.id - 1]?.key || ''}
                       onChange={(e) => {
                         handleChangeComponentArray(field.id, 'key', e.target.value)
                       }}
@@ -355,6 +467,7 @@ function ComponentElement() {
                   <CCol sm={3}>
                     <CFormInput
                       placeholder="Element Name"
+                      value={formComponentElementFields[field.id - 1]?.name || ''}
                       id={`key_${field.id}`}
                       onChange={(e) => {
                         handleChangeComponentArray(field.id, 'name', e.target.value)
@@ -369,6 +482,7 @@ function ComponentElement() {
                   <CCol sm={3}>
                     <CFormSelect
                       style={{ cursor: 'pointer' }}
+                      value={formComponentElementFields[field.id - 1]?.status || '-1'}
                       id={`key_${field.id}`}
                       onChange={(e) => {
                         handleChangeComponentArray(field.id, 'status', e.target.value)
@@ -383,7 +497,7 @@ function ComponentElement() {
                       Please select a status.
                     </CFormFeedback>
                   </CCol>
-                  <CCol sm={1}>
+                  <CCol sm={1} style={{ display: editable ? 'none' : 'block' }}>
                     <CCol xs="auto" style={{ marginTop: '0px' }}>
                       <CButton
                         type="button"
@@ -398,8 +512,7 @@ function ComponentElement() {
                   </CCol>
                 </React.Fragment>
               ))}
-
-              <CCol sm={1}>
+              <CCol sm={1} style={{ display: editable ? 'none' : 'block' }}>
                 <CCol xs="auto" style={{ marginTop: '0px' }}>
                   <CButton
                     type="button"
@@ -416,6 +529,15 @@ function ComponentElement() {
                 <CCol xs="auto" style={{ marginTop: '30px' }}>
                   <CButton color="primary" type="submit">
                     Create
+                  </CButton>{' '}
+                  &nbsp;
+                  <CButton
+                    color="success"
+                    type="reset"
+                    style={{ color: 'white' }}
+                    onClick={() => handleReset()}
+                  >
+                    Reset
                   </CButton>
                 </CCol>
               </CRow>
@@ -443,17 +565,27 @@ function ComponentElement() {
                 <CTableRow>
                   <CTableDataCell>{index + 1}</CTableDataCell>
                   <CTableDataCell>{componentElement.scope}</CTableDataCell>
-                  <CTableDataCell>{componentElement.module}</CTableDataCell>
-                  <CTableDataCell>{componentElement.component}</CTableDataCell>
+                  <CTableDataCell>{componentElement.moduleName}</CTableDataCell>
+                  <CTableDataCell>{componentElement.componentName}</CTableDataCell>
                   <CTableDataCell>{componentElement.key}</CTableDataCell>
                   <CTableDataCell>{componentElement.name}</CTableDataCell>
                   <CTableDataCell>{componentElement.status}</CTableDataCell>
                   <CTableDataCell>
-                    <CButton type="button" className="btn btn-primary btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() =>
+                        handleEditComponentElement(componentElement.componentElementId)
+                      }
+                    >
                       <span style={{ color: 'white' }}>Edit</span>
                     </CButton>{' '}
                     &nbsp;
-                    <CButton type="button" className="btn btn-danger btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(componentElement.componentElementId)}
+                    >
                       <span style={{ color: 'white' }}>Delete</span>
                     </CButton>{' '}
                   </CTableDataCell>

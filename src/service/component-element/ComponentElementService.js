@@ -32,3 +32,29 @@ export const getAllWithPagination = (currentPage, size) => {
     throw error
   }
 }
+
+export const getComponentElementById = (id) => {
+  try {
+    const response = axios.get(`${COMPONENT_ELEMENT_API_URL}/get-by-id`, {
+      params: {
+        id: id,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
+export const deleteComponentElementById = (id) => {
+  try {
+    const response = axios.delete(`${COMPONENT_ELEMENT_API_URL}/delete-by-id`, {
+      params: {
+        id: id,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}

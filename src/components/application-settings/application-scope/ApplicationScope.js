@@ -39,7 +39,7 @@ const ApplicationScope = () => {
   const [formData, setFormData] = useState({
     applicationScopeId: '',
     scope: '',
-    status: '-1',
+    status: undefined,
     uniqueId: '',
   })
 
