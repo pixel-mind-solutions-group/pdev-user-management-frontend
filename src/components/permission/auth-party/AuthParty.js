@@ -28,9 +28,11 @@ import {
 import Pagination from '../../UI/pagination/Pagination'
 
 function AuthParty() {
+  const [editable, setEditable] = useState(false)
   const [validated, setValidated] = useState(false)
   const [formData, setFormData] = useState({
-    party: null,
+    id: '',
+    party: '',
     status: '-1',
   })
 
@@ -57,6 +59,7 @@ function AuthParty() {
             text: data.message,
           })
           getAllAuthParties(currentPage, pageSize)
+          handleReset()
         }
       } catch (error) {
         console.error('Error occuring while creating auth party. ', error)
@@ -104,6 +107,82 @@ function AuthParty() {
       })
     }
   }
+
+  const handleEditAuthParty = async (id) => {
+    try {
+      handleReset()
+      const data = await getById(id)
+      if (data.data.status === 'OK') {
+        const authParty = data.data.data
+        setFormData((prevData) => ({
+          ...prevData,
+          id: authParty.authorizePartyId,
+          party: authParty.party,
+          status: authParty.status,
+        }))
+        setEditable(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch auth party. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Auth party fetching failed.',
+      })
+    }
+  }
+
+  const handleReset = () => {
+    setFormData({
+      id: '',
+      party: '',
+      status: '-1',
+    })
+    setEditable(false)
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Do you want to delete?',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Don't delete`,
+      })
+      if (result.isConfirmed) {
+        const data = await deleteById(id)
+        if (data.data.status === 'OK') {
+          Swal.fire('Deleted!', '', 'success')
+          getAllAuthParties(currentPage, pageSize)
+          handleReset()
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.data.message,
+          })
+        }
+        handleReset()
+      } else if (result.isDenied) {
+        Swal.fire('Changes are not saved', '', 'info')
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to delete auth party. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Auth party deleting failed.',
+      })
+    }
+  }
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -122,6 +201,7 @@ function AuthParty() {
                 <CFormLabel htmlFor="party">Party</CFormLabel>
                 <CFormInput
                   id="party"
+                  value={formData.party}
                   placeholder="Party"
                   required
                   onChange={(e) => {
@@ -136,6 +216,7 @@ function AuthParty() {
                 <CFormLabel htmlFor="status">Status</CFormLabel>
                 <CFormSelect
                   id="status"
+                  value={formData.status}
                   style={{ cursor: 'pointer' }}
                   required
                   onChange={(e) => {
@@ -152,8 +233,18 @@ function AuthParty() {
               </CCol>
               <CCol xs="auto" style={{ marginTop: '40px' }}>
                 <CButton color="primary" type="submit">
-                  Create
+                  {(editable && 'Update') || 'Create'}
+                </CButton>{' '}
+                &nbsp;
+                <CButton
+                  color="success"
+                  type="reset"
+                  style={{ color: 'white' }}
+                  onClick={() => handleReset()}
+                >
+                  Reset
                 </CButton>
+                <div className="w-100" id="id" value={formData.id}></div>
               </CCol>
             </CForm>
           </CCardBody>
@@ -177,11 +268,19 @@ function AuthParty() {
                   <CTableDataCell>{a.party}</CTableDataCell>
                   <CTableDataCell>{a.status}</CTableDataCell>
                   <CTableDataCell>
-                    <CButton type="button" className="btn btn-primary btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => handleEditAuthParty(a.authorizePartyId)}
+                    >
                       <span style={{ color: 'white' }}>Edit</span>
                     </CButton>{' '}
                     &nbsp;
-                    <CButton type="button" className="btn btn-danger btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(a.authorizePartyId)}
+                    >
                       <span style={{ color: 'white' }}>Delete</span>
                     </CButton>{' '}
                   </CTableDataCell>
