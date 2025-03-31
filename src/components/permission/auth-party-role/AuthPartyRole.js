@@ -34,9 +34,11 @@ function AuthPartyRole() {
   const [authPartyRoles, setAuthPartyRoles] = useState([])
   const pageSize = 10
 
+  const [editable, setEditable] = useState(false)
   const [validated, setValidated] = useState(false)
   const [formData, setFormData] = useState({
-    role: null,
+    id: '',
+    role: '',
     status: '-1',
   })
 
@@ -57,6 +59,7 @@ function AuthPartyRole() {
             text: data.message,
           })
           getAllAuthPartyRoles(currentPage, pageSize)
+          handleReset()
         }
       } catch (error) {
         console.error('Error occuring while creating auth party role. ', error)
@@ -104,6 +107,82 @@ function AuthPartyRole() {
       })
     }
   }
+
+  const handleEditAuthPartyRole = async (id) => {
+    try {
+      handleReset()
+      const data = await getById(id)
+      if (data.data.status === 'OK') {
+        const authParty = data.data.data
+        setFormData((prevData) => ({
+          ...prevData,
+          id: authParty.id,
+          role: authParty.role,
+          status: authParty.status,
+        }))
+        setEditable(true)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch auth party role. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Auth party role fetching failed.',
+      })
+    }
+  }
+
+  const handleReset = () => {
+    setFormData({
+      id: '',
+      role: '',
+      status: '-1',
+    })
+    setEditable(false)
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Do you want to delete?',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Don't delete`,
+      })
+      if (result.isConfirmed) {
+        const data = await deleteById(id)
+        if (data.data.status === 'OK') {
+          Swal.fire('Deleted!', '', 'success')
+          getAllAuthPartyRoles(currentPage, pageSize)
+          handleReset()
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.data.message,
+          })
+        }
+        handleReset()
+      } else if (result.isDenied) {
+        Swal.fire('Changes are not saved', '', 'info')
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to delete auth party role. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Auth party role deleting failed.',
+      })
+    }
+  }
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -122,6 +201,7 @@ function AuthPartyRole() {
                 <CFormLabel htmlFor="role">Role</CFormLabel>
                 <CFormInput
                   id="role"
+                  value={formData.role}
                   placeholder="Role"
                   required
                   onChange={(e) => {
@@ -136,9 +216,10 @@ function AuthPartyRole() {
                 <CFormLabel htmlFor="status">Status</CFormLabel>
                 <CFormSelect
                   id="status"
+                  value={formData.status}
                   style={{ cursor: 'pointer' }}
                   required
-                  onChange={() => {
+                  onChange={(e) => {
                     handleFormChange(e)
                   }}
                 >
@@ -152,8 +233,18 @@ function AuthPartyRole() {
               </CCol>
               <CCol xs="auto" style={{ marginTop: '40px' }}>
                 <CButton color="primary" type="submit">
-                  Create
+                  {(editable && 'Update') || 'Create'}
+                </CButton>{' '}
+                &nbsp;
+                <CButton
+                  color="success"
+                  type="reset"
+                  style={{ color: 'white' }}
+                  onClick={() => handleReset()}
+                >
+                  Reset
                 </CButton>
+                <div className="w-100" id="id" value={formData.id}></div>
               </CCol>
             </CForm>
           </CCardBody>
@@ -177,11 +268,19 @@ function AuthPartyRole() {
                   <CTableDataCell>{partyRole.role}</CTableDataCell>
                   <CTableDataCell>{partyRole.status}</CTableDataCell>
                   <CTableDataCell>
-                    <CButton type="button" className="btn btn-primary btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => handleEditAuthPartyRole(partyRole.id)}
+                    >
                       <span style={{ color: 'white' }}>Edit</span>
                     </CButton>{' '}
                     &nbsp;
-                    <CButton type="button" className="btn btn-danger btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(partyRole.id)}
+                    >
                       <span style={{ color: 'white' }}>Delete</span>
                     </CButton>{' '}
                   </CTableDataCell>

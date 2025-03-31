@@ -39,7 +39,7 @@ export const getById = (id) => {
 
 export const deleteById = (id) => {
   try {
-    const response = axios.get(`${COMPONENT_API_URL}/delete-by-id`, {
+    const response = axios.delete(`${COMPONENT_API_URL}/delete-by-id`, {
       params: {
         id: id,
       },
