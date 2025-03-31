@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { environment } from '../../../environments/environment'
-const COMPONENT_API_URL = `${environment.baseUrl}` + '/authorize-party-profile/v1'
+const AUTH_PARTY_PROFILE_API_URL = `${environment.baseUrl}` + '/authorize-party-profile/v1'
 
 export const createOrUpdate = async (data) => {
   try {
-    const response = await axios.post(`${COMPONENT_API_URL}/create-or-update`, data, {
+    const response = await axios.post(`${AUTH_PARTY_PROFILE_API_URL}/create-or-update`, data, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -17,7 +17,7 @@ export const createOrUpdate = async (data) => {
 
 export const getAll = () => {
   try {
-    const response = axios.get(`${COMPONENT_API_URL}/get-all`)
+    const response = axios.get(`${AUTH_PARTY_PROFILE_API_URL}/get-all`)
     return response
   } catch (error) {
     throw error
@@ -26,7 +26,7 @@ export const getAll = () => {
 
 export const getAuthProfileByAuthPartyId = (id) => {
   try {
-    const response = axios.get(`${COMPONENT_API_URL}/get-by-auth-party`, {
+    const response = axios.get(`${AUTH_PARTY_PROFILE_API_URL}/get-by-auth-party`, {
       params: {
         id: id,
       },
@@ -39,7 +39,7 @@ export const getAuthProfileByAuthPartyId = (id) => {
 
 export const deleteById = (id) => {
   try {
-    const response = axios.get(`${COMPONENT_API_URL}/delete-by-id`, {
+    const response = axios.delete(`${AUTH_PARTY_PROFILE_API_URL}/delete-by-auth-party`, {
       params: {
         id: id,
       },
@@ -52,7 +52,7 @@ export const deleteById = (id) => {
 
 export const getAllWithPagination = (currentPage, size) => {
   try {
-    const response = axios.get(`${COMPONENT_API_URL}/get-all-page`, {
+    const response = axios.get(`${AUTH_PARTY_PROFILE_API_URL}/get-all-page`, {
       params: {
         page: currentPage,
         size: size,
