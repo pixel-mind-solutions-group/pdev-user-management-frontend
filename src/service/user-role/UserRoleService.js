@@ -1,11 +1,11 @@
 import axios from 'axios'
 import { environment } from '../../environments/environment'
 
-const COMPONENT_API_URL = `${environment.baseUrl}` + '/user-role/v1'
+const USER_ROLE_API_URL = `${environment.baseUrl}` + '/user-role/v1'
 
 export const createOrUpdate = async (data) => {
   try {
-    const response = await axios.post(`${COMPONENT_API_URL}/create-or-update`, data, {
+    const response = await axios.post(`${USER_ROLE_API_URL}/create-or-update`, data, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -18,7 +18,7 @@ export const createOrUpdate = async (data) => {
 
 export const getAll = () => {
   try {
-    const response = axios.get(`${COMPONENT_API_URL}/get-all`)
+    const response = axios.get(`${USER_ROLE_API_URL}/get-all`)
     return response
   } catch (error) {
     throw error
@@ -27,7 +27,7 @@ export const getAll = () => {
 
 export const getById = (id) => {
   try {
-    const response = axios.get(`${COMPONENT_API_URL}/get-by-id`, {
+    const response = axios.get(`${USER_ROLE_API_URL}/get-by-id`, {
       params: {
         id: id,
       },
@@ -40,7 +40,7 @@ export const getById = (id) => {
 
 export const deleteById = (id) => {
   try {
-    const response = axios.get(`${COMPONENT_API_URL}/delete-by-id`, {
+    const response = axios.delete(`${USER_ROLE_API_URL}/delete-by-id`, {
       params: {
         id: id,
       },
@@ -53,7 +53,7 @@ export const deleteById = (id) => {
 
 export const getAllWithPagination = (currentPage, size) => {
   try {
-    const response = axios.get(`${COMPONENT_API_URL}/get-all-page`, {
+    const response = axios.get(`${USER_ROLE_API_URL}/get-all-page`, {
       params: {
         page: currentPage,
         size: size,

@@ -256,6 +256,7 @@ function AuthParty() {
             <CTableRow>
               <CTableHeaderCell scope="col">No</CTableHeaderCell>
               <CTableHeaderCell scope="col">Name</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Application Scope</CTableHeaderCell>
               <CTableHeaderCell scope="col">Status</CTableHeaderCell>
               <CTableHeaderCell scope="col">Action</CTableHeaderCell>
             </CTableRow>
