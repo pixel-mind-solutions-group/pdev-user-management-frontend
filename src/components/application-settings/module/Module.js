@@ -27,6 +27,7 @@ import {
   deleteModuleById,
 } from '../../../service/module/ModuleService'
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
+import Status from '../../constants/status'
 
 const Module = () => {
   // dynamic form fields
@@ -355,9 +356,13 @@ const Module = () => {
                       }}
                       required
                     >
-                      <option value="-1">Select a status</option>
-                      <option value="Active">Active</option>
-                      <option value="In_active">In-active</option>
+                      {Status.getAllStatuses().map((staus) => {
+                        return (
+                          <option key={staus.value} value={staus.value}>
+                            {staus.label}
+                          </option>
+                        )
+                      })}
                     </CFormSelect>
                     <CFormFeedback tooltip invalid>
                       Please select a status.

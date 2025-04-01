@@ -28,6 +28,7 @@ import {
   CTableRow,
 } from '@coreui/react'
 import Pagination from '../UI/pagination/Pagination'
+import Status from '../../constants/status'
 
 function UserRole() {
   // page response
@@ -255,9 +256,13 @@ function UserRole() {
                     handleFormChange(e)
                   }}
                 >
-                  <option value="-1">Select a status</option>
-                  <option value="Active">Active</option>
-                  <option value="In_active">In-active</option>
+                  {Status.getAllStatuses().map((staus) => {
+                    return (
+                      <option key={staus.value} value={staus.value}>
+                        {staus.label}
+                      </option>
+                    )
+                  })}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select a status.
