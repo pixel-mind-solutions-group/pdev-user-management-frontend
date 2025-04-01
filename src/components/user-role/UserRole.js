@@ -28,7 +28,7 @@ import {
   CTableRow,
 } from '@coreui/react'
 import Pagination from '../UI/pagination/Pagination'
-import Status from '../../constants/status'
+import Status from '../constants/Status'
 
 function UserRole() {
   // page response
