@@ -28,7 +28,6 @@ import {
   deleteComponentById,
 } from '../../../service/component/ComponentService'
 import Pagination from '../../UI/pagination/Pagination'
-import Status from '../../constants/status/Status'
 
 function Component() {
   // dynamic form fields
@@ -408,13 +407,9 @@ function Component() {
                       }}
                       required
                     >
-                      {Status.getAllStatuses().map((staus) => {
-                        return (
-                          <option key={staus.value} value={staus.value}>
-                            {staus.label}
-                          </option>
-                        )
-                      })}
+                      <option value="-1">Select a status</option>
+                      <option value="Active">Active</option>
+                      <option value="In_active">In-active</option>
                     </CFormSelect>
                     <CFormFeedback tooltip invalid>
                       Please select a status.
