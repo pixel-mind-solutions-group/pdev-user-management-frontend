@@ -27,6 +27,7 @@ import {
   deleteById,
 } from '../../../service/application-scope/ApplicationScopeService'
 import Pagination from '../../UI/pagination/Pagination'
+import Status from '../../constants/status'
 
 const ApplicationScope = () => {
   // page response
@@ -225,9 +226,13 @@ const ApplicationScope = () => {
                   onChange={handleFormChange}
                   required
                 >
-                  <option value="-1">Select a status</option>
-                  <option value="Active">Active</option>
-                  <option value="In_active">In-active</option>
+                  {Status.getAllStatuses().map((staus) => {
+                    return (
+                      <option key={staus.value} value={staus.value}>
+                        {staus.label}
+                      </option>
+                    )
+                  })}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select a status.

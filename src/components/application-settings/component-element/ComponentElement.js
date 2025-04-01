@@ -29,6 +29,7 @@ import {
 } from '../../../service/component-element/ComponentElementService'
 import Swal from 'sweetalert2'
 import Pagination from '../../UI/pagination/Pagination'
+import Status from '../../constants/status'
 
 function ComponentElement() {
   // dynamic form fields
@@ -489,9 +490,13 @@ function ComponentElement() {
                       }}
                       required
                     >
-                      <option value="-1">Select a status</option>
-                      <option value="Active">Active</option>
-                      <option value="In_active">In-active</option>
+                      {Status.getAllStatuses().map((staus) => {
+                        return (
+                          <option key={staus.value} value={staus.value}>
+                            {staus.label}
+                          </option>
+                        )
+                      })}
                     </CFormSelect>
                     <CFormFeedback tooltip invalid>
                       Please select a status.
