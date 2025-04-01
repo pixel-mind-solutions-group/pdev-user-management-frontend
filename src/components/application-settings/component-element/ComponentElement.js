@@ -29,7 +29,7 @@ import {
 } from '../../../service/component-element/ComponentElementService'
 import Swal from 'sweetalert2'
 import Pagination from '../../UI/pagination/Pagination'
-import Status from '../../constants/status'
+import Status from '../../constants/status/Status'
 
 function ComponentElement() {
   // dynamic form fields

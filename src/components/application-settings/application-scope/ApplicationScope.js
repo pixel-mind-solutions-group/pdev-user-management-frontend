@@ -27,7 +27,7 @@ import {
   deleteById,
 } from '../../../service/application-scope/ApplicationScopeService'
 import Pagination from '../../UI/pagination/Pagination'
-import Status from '../../constants/status'
+import Status from '../../constants/status/Status'
 
 const ApplicationScope = () => {
   // page response

@@ -26,7 +26,7 @@ import {
 } from '../../../service/permission/auth-party-role/AuthPartyRoleService'
 import Pagination from '../../UI/pagination/Pagination'
 import Swal from 'sweetalert2'
-import Status from '../../constants/status'
+import Status from '../../constants/status/Status'
 
 function AuthPartyRole() {
   // page response

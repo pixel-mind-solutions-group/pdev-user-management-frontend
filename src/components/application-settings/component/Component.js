@@ -28,7 +28,7 @@ import {
   deleteComponentById,
 } from '../../../service/component/ComponentService'
 import Pagination from '../../UI/pagination/Pagination'
-import Status from '../../constants/status'
+import Status from '../../constants/status/Status'
 
 function Component() {
   // dynamic form fields

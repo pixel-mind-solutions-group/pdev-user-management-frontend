@@ -27,7 +27,7 @@ import {
   deleteModuleById,
 } from '../../../service/module/ModuleService'
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
-import Status from '../../constants/status'
+import Status from '../../constants/status/Status'
 
 const Module = () => {
   // dynamic form fields

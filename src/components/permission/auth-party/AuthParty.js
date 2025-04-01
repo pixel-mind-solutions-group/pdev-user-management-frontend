@@ -26,7 +26,7 @@ import {
   deleteById,
 } from '../../../service/permission/auth-party/AuthPartyService'
 import Pagination from '../../UI/pagination/Pagination'
-import Status from '../../constants/status'
+import Status from '../../constants/status/Status'
 
 function AuthParty() {
   const [editable, setEditable] = useState(false)
