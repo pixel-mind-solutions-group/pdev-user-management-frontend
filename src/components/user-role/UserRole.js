@@ -211,7 +211,7 @@ function UserRole() {
       Swal.fire({
         icon: 'error',
         title: 'Internal Server Error',
-        text: 'User role deleting failed.',
+        text: error.response.data.message,
       })
     }
   }
