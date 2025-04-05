@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -23,8 +23,17 @@ import {
   CTableRow,
   CInputGroup,
 } from '@coreui/react'
+import Swal from 'sweetalert2'
+import { getAllUserRolesByScope } from '../../../service/user-role/UserRoleService'
+import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
 
 function AccessControl() {
+  const [userRoles, setUserRoles] = useState([])
+  const [scopes, setScopes] = useState([])
+  useEffect(() => {
+    getApplicationScopes()
+  }, [])
+
   const [validated, setValidated] = useState(false)
   const handleSubmit = (event) => {
     const form = event.currentTarget
@@ -42,6 +51,59 @@ function AccessControl() {
       }
     })
     setValidated(true)
+  }
+
+  const getUserRolesByScope = async (e) => {
+    try {
+      const uuid = e.target.value
+      if (uuid === '-1') {
+        setUserRoles([])
+        return
+      }
+      console.log('uuid', uuid)
+      const data = await getAllUserRolesByScope(uuid)
+      if (data.data.status === 'OK') {
+        setUserRoles(data.data.data)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error(
+        'Error occuring while calling user service to fetch active user roles by scope. ',
+        error,
+      )
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'User roles fetching failed.',
+      })
+    }
+  }
+
+  const getApplicationScopes = async () => {
+    try {
+      const data = await getAllAppScopes()
+      if (data.status == 'OK') {
+        setScopes(data.data)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch all scopes. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Application scopes fetching failed.',
+      })
+    }
   }
 
   /* 
@@ -86,8 +148,22 @@ function AccessControl() {
             >
               <CCol sm={4}>
                 <CFormLabel htmlFor="specificSizeSelect">Application Scope</CFormLabel>
-                <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
+                <CFormSelect
+                  id="specificSizeSelect"
+                  style={{ cursor: 'pointer' }}
+                  required
+                  onChange={() => {
+                    getUserRolesByScope(event)
+                  }}
+                >
                   <option value="-1">Select an application scope</option>
+                  {scopes.map((scope, index) => {
+                    return (
+                      <option key={index} value={scope.uniqueId}>
+                        {scope.scope}
+                      </option>
+                    )
+                  })}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select an application scope.
@@ -97,6 +173,13 @@ function AccessControl() {
                 <CFormLabel htmlFor="specificSizeSelect">User Role</CFormLabel>
                 <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
                   <option value="-1">Select a user role</option>
+                  {userRoles.map((role, index) => {
+                    return (
+                      <option key={index} value={role.userRoleId}>
+                        {role.role}
+                      </option>
+                    )
+                  })}
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select a user role.

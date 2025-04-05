@@ -21,7 +21,6 @@ import {
   CTableDataCell,
   CTableRow,
 } from '@coreui/react'
-import Status from '../../constants/status'
 
 const User = () => {
   const [validated, setValidated] = useState(false)
@@ -116,13 +115,9 @@ const User = () => {
               <CCol sm={4}>
                 <CFormLabel htmlFor="specificSizeSelect">Status</CFormLabel>
                 <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
-                  {Status.getAllStatuses().map((staus) => {
-                    return (
-                      <option key={staus.value} value={staus.value}>
-                        {staus.label}
-                      </option>
-                    )
-                  })}
+                  <option value="-1">Select a status</option>
+                  <option value="Active">Active</option>
+                  <option value="In_active">In-active</option>
                 </CFormSelect>
                 <CFormFeedback tooltip invalid>
                   Please select a status.

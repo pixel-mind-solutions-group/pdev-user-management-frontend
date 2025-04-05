@@ -25,6 +25,19 @@ export const getAll = () => {
   }
 }
 
+export const getAllUserRolesByScope = (uuid) => {
+  try {
+    const response = axios.get(`${USER_ROLE_API_URL}/get-by-scope`, {
+      params: {
+        uuid: uuid,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
 export const getById = (id) => {
   try {
     const response = axios.get(`${USER_ROLE_API_URL}/get-by-id`, {
