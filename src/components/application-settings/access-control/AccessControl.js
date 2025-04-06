@@ -28,7 +28,7 @@ import { getAllUserRolesByScope } from '../../../service/user-role/UserRoleServi
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
 import { getByUUID as getModulesByUUID } from '../../../service/module/ModuleService'
 import { getComponentsByScopeAndModules as getAllComponentsByScopeAndModules } from '../../../service/component/ComponentService'
-import { comment } from 'postcss'
+import { getComponentElementsByScopeAndComponents as getAllComponentElementsByScopeAndComponents } from '../../../service/component-element/ComponentElementService'
 
 function AccessControl() {
   const [userRoles, setUserRoles] = useState([])
@@ -51,7 +51,7 @@ function AccessControl() {
   }, [selectedModules])
 
   useEffect(() => {
-    console.log(selectedComponents)
+    handleLoadComponentElementsByCheckedComponents()
   }, [selectedComponents])
 
   const [validated, setValidated] = useState(false)
@@ -226,32 +226,41 @@ function AccessControl() {
     })
   }
 
-  /* 
-          const [modules, setModules] = useState([]) -> array of modules ids  -> ex: 1, 2, 3, 4...
-  
-          const [selectedModules, setSelectedModules] = useState([]) -> array of selected modules ids  -> ex: 1, 2, 4
-  
-          const [components, setComponents] = useState([]) -> array of components related to selected modules ids
-            ex: new Map([
-              [1 => [(101), 102, 103],         module id 1 -> components ids (101, 102, 103)
-              [2 => [201, (202), 203],         module id 2 -> components ids (201, 202, 202)
-              [4 => [(401), 403, 404],         module id 3 -> components ids (401, 403, 404)
-            ])                                                    
-  
-          const [selectedComponents, setSelectedComponents] = useState([]) -> array of selected components ids -> ex: 101, 202, 401
-  
-          const [componentElements, setComponentElements] = useState([]) -> array of component elements related to selected components ids
-            ex: new Map([
-              [101 => [(1011), 1022, 1033],         component id 101 -> comp-element ids (1011, 1022, 1033)
-              [202 => [2011, (2022), 2033],         component id 202 -> comp-element ids (2011, 2022, 2033)
-              [401 => [(4011), 4033, 4044],         component id 401 -> comp-element ids (4011, 4033, 4044)
-            ])    
-  
-          const [selectedComponentElements, setSelectedComponentElements] = useState([]) -> array of selected component elements ids -> ex: 1011, 2022, 4011
-          
-          IDS should be objects...  ex: <obj, [abj1, obj2, obj3]>
-      
-  */
+  const handleLoadComponentElementsByCheckedComponents = async () => {
+    if (selectedComponents.length === 0) {
+      return
+    }
+    const scope = document.getElementById('appScope').value
+    const components = selectedComponents
+    try {
+      const data = await getAllComponentElementsByScopeAndComponents(scope, components)
+      if (data.data.status === 'OK') {
+        console.log(data.data.data)
+        var mapObj = new Map()
+        data.data.data.forEach((data) => {
+          mapObj.set(data.component, data.componentElements)
+        })
+        setComponentElements(mapObj)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error(
+        'Error occuring while calling user service to fetch component elements by scope and components. ',
+        error,
+      )
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Component elements fetching failed.',
+      })
+    }
+  }
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -362,6 +371,9 @@ function AccessControl() {
                                           label={c.key}
                                           style={{ cursor: 'pointer' }}
                                           onChange={(e) => handleComponentCheck(e)}
+                                          checked={selectedComponents.includes(
+                                            c.component.toString(),
+                                          )}
                                         />
                                       </div>
                                     </React.Fragment>
