@@ -281,18 +281,18 @@ function AccessControl() {
         updatedForm.components = selectedComponents
         updatedForm.componentElements = selectedComponentElements
         const data = await createOrUpdate(updatedForm)
-        if (data.status === 'OK') {
+        if (data.data.status === 'CREATED') {
           Swal.fire({
             icon: 'success',
             title: 'Success',
-            text: data.message,
+            text: data.data.message,
           })
           handleReset()
         } else {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: data.message,
+            text: data.data.message,
           })
         }
       } catch (error) {
@@ -324,12 +324,7 @@ function AccessControl() {
             <strong>Manage Access Controls</strong>
           </CCardHeader>
           <CCardBody>
-            <CForm
-              className="row gx-3 gy-2 align-items-center"
-              noValidate
-              validated={validated}
-              onSubmit={handleSubmit}
-            >
+            <CForm className="row gx-3 gy-2 align-items-center" noValidate validated={validated}>
               <CCol sm={4}>
                 <CFormLabel htmlFor="specificSizeSelect">Application Scope</CFormLabel>
                 <CFormSelect
@@ -510,7 +505,7 @@ function AccessControl() {
           </CAccordion>
           <br />
           <CCol xs={12} className="d-flex justify-content-end">
-            <CButton color="primary" type="submit">
+            <CButton color="primary" type="submit" onClick={handleSubmit}>
               {(editable && 'Update') || 'Create'}
             </CButton>{' '}
             &nbsp;
