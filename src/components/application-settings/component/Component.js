@@ -19,7 +19,7 @@ import {
   CTableRow,
 } from '@coreui/react'
 import Swal from 'sweetalert2'
-import { getAll as getByUUID } from '../../../service/module/ModuleService'
+import { getByUUID as getByUUID } from '../../../service/module/ModuleService'
 import { getAll as getAppScopes } from '../../../service/application-scope/ApplicationScopeService'
 import {
   createOrUpdate,
@@ -222,12 +222,12 @@ function Component() {
           updatedObjects[0] = { ...updatedObjects[0], ['status']: component.status }
           return updatedObjects
         })
-        getModulesByAppScope(component.applicationScope)
+        getModulesByAppScope(component.uuid)
         setFormData((prevData) => ({
           ...prevData,
           component: component.component,
           module: component.module,
-          applicationScope: component.applicationScope,
+          applicationScope: component.uuid,
         }))
         setEditable(true)
       } else {
@@ -250,6 +250,7 @@ function Component() {
   const handleReset = () => {
     setEditable(false)
     setFormComponentFields([])
+    setModules([])
     setFormComponents([{ id: 1 }])
     setFormData((prevData) => ({
       ...prevData,
@@ -288,11 +289,19 @@ function Component() {
       }
     } catch (error) {
       console.error('Error occuring while calling user service to delete component. ', error)
-      Swal.fire({
-        icon: 'error',
-        title: 'Internal Server Error',
-        text: 'Component deleting failed.',
-      })
+      if (error.response.data.httpStatus === 'BAD_REQUEST') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Internal Server Error',
+          text: error.response.data.message,
+        })
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Internal Server Error',
+          text: 'Component deleting failed.',
+        })
+      }
     }
   }
 

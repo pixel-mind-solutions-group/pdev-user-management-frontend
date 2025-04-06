@@ -198,7 +198,7 @@ const Module = () => {
         setFormData((prevData) => ({
           ...prevData,
           id: module.id,
-          applicationScope: module.applicationScope,
+          applicationScope: module.uuid,
         }))
         setEditable(true)
       } else {
@@ -257,11 +257,19 @@ const Module = () => {
       }
     } catch (error) {
       console.error('Error occuring while calling user service to delete module. ', error)
-      Swal.fire({
-        icon: 'error',
-        title: 'Internal Server Error',
-        text: 'Module deleting failed.',
-      })
+      if (error.response.data.httpStatus === 'BAD_REQUEST') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Internal Server Error',
+          text: error.response.data.message,
+        })
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Internal Server Error',
+          text: 'Module deleting failed.',
+        })
+      }
     }
   }
 

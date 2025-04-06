@@ -53,6 +53,20 @@ export const getComponentsByScopeAndModule = (scope, module) => {
   }
 }
 
+export const getComponentsByScopeAndModules = (scope, modules) => {
+  try {
+    const response = axios.get(`${COMPONENT_API_URL}/get-by-scope-and-modules`, {
+      params: {
+        scope: scope,
+        modules: modules.join(','),
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
 export const getComponentById = (id) => {
   try {
     const response = axios.get(`${COMPONENT_API_URL}/get-by-id`, {

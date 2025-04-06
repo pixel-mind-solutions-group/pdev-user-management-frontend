@@ -267,8 +267,8 @@ function ComponentElement() {
           updatedObjects[0] = { ...updatedObjects[0], ['status']: componentElement.status }
           return updatedObjects
         })
-        getModulesByAppScope(componentElement.scope)
-        setSelectedAppScope(componentElement.scope)
+        getModulesByAppScope(componentElement.uuid)
+        setSelectedAppScope(componentElement.uuid)
         setSelectedModule(componentElement.module)
         getComponentsByAppScopeAndModule()
         setFormData((prevData) => ({
@@ -276,7 +276,7 @@ function ComponentElement() {
           componentElementId: componentElement.componentElementId,
           module: componentElement.module,
           component: componentElement.component,
-          applicationScope: componentElement.scope,
+          applicationScope: componentElement.uuid,
         }))
         setEditable(true)
       } else {
@@ -528,7 +528,7 @@ function ComponentElement() {
               <CRow className="justify-content-end">
                 <CCol xs="auto" style={{ marginTop: '30px' }}>
                   <CButton color="primary" type="submit">
-                    Create
+                    {(editable && 'Update') || 'Create'}
                   </CButton>{' '}
                   &nbsp;
                   <CButton
