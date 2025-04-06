@@ -29,6 +29,7 @@ import { getAll as getAllAppScopes } from '../../../service/application-scope/Ap
 import { getByUUID as getModulesByUUID } from '../../../service/module/ModuleService'
 import { getComponentsByScopeAndModules as getAllComponentsByScopeAndModules } from '../../../service/component/ComponentService'
 import { getComponentElementsByScopeAndComponents as getAllComponentElementsByScopeAndComponents } from '../../../service/component-element/ComponentElementService'
+import { createOrUpdate } from '../../../service/access-control/AccessControlService'
 
 function AccessControl() {
   const [userRoles, setUserRoles] = useState([])
@@ -41,7 +42,15 @@ function AccessControl() {
   const [selectedComponents, setSelectedComponents] = useState([])
   const [componentElements, setComponentElements] = useState(new Map())
   const [selectedComponentElements, setSelectedComponentElements] = useState([])
-  const [moduleAllCheck, setModuleAllCheck] = useState(false)
+  const [editable, setEditable] = useState(false)
+  const [validated, setValidated] = useState(false)
+  const [formData, setFormData] = useState({
+    userRole: '',
+    applicationScope: '',
+    modules: [],
+    components: [],
+    componentElements: [],
+  })
 
   useEffect(() => {
     getApplicationScopes()
@@ -54,25 +63,6 @@ function AccessControl() {
   useEffect(() => {
     handleLoadComponentElementsByCheckedComponents()
   }, [selectedComponents])
-
-  const [validated, setValidated] = useState(false)
-  const handleSubmit = (event) => {
-    const form = event.currentTarget
-    if (form.checkValidity() === false) {
-      event.preventDefault()
-      event.stopPropagation()
-    }
-
-    const selects = form.querySelectorAll('select')
-    selects.forEach((select) => {
-      if (select.value === '-1') {
-        select.setCustomValidity('Please select an option.')
-      } else {
-        select.setCustomValidity('')
-      }
-    })
-    setValidated(true)
-  }
 
   const getUserRolesByScope = async (e) => {
     try {
@@ -278,6 +268,54 @@ function AccessControl() {
     }
   }
 
+  const handleSubmit = async (event) => {
+    const form = event.currentTarget
+    if (form.checkValidity() === false) {
+      event.preventDefault()
+      event.stopPropagation()
+      setValidated(true)
+    } else {
+      const updatedForm = { ...formData }
+      try {
+        updatedForm.modules = selectedModules
+        updatedForm.components = selectedComponents
+        updatedForm.componentElements = selectedComponentElements
+        const data = await createOrUpdate(updatedForm)
+        if (data.status === 'OK') {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: data.message,
+          })
+          handleReset()
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message,
+          })
+        }
+      } catch (error) {
+        console.error('Error occuring while creating access control. ', error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.response.data.details[1],
+        })
+      }
+    }
+  }
+
+  const handleReset = () => {
+    setEditable(false)
+    setModules([])
+    setSelectedModules([])
+    setComponents(new Map())
+    setSelectedComponents([])
+    setComponentElements(new Map())
+    setSelectedComponentElements([])
+  }
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -298,9 +336,13 @@ function AccessControl() {
                   id="appScope"
                   style={{ cursor: 'pointer' }}
                   required
-                  onChange={() => {
+                  onChange={(event) => {
                     getUserRolesByScope(event)
                     getAllModulesByUUID(event)
+                    setFormData({
+                      ...formData,
+                      applicationScope: event.target.value,
+                    })
                   }}
                 >
                   <option value="-1">Select an application scope</option>
@@ -318,7 +360,17 @@ function AccessControl() {
               </CCol>
               <CCol sm={4}>
                 <CFormLabel htmlFor="specificSizeSelect">User Role</CFormLabel>
-                <CFormSelect id="userRole" style={{ cursor: 'pointer' }} required>
+                <CFormSelect
+                  id="userRole"
+                  style={{ cursor: 'pointer' }}
+                  required
+                  onChange={(e) => {
+                    setFormData({
+                      ...formData,
+                      userRole: e.target.value,
+                    })
+                  }}
+                >
                   <option value="-1">Select a user role</option>
                   {userRoles.map((role, index) => {
                     return (
@@ -459,7 +511,16 @@ function AccessControl() {
           <br />
           <CCol xs={12} className="d-flex justify-content-end">
             <CButton color="primary" type="submit">
-              Create
+              {(editable && 'Update') || 'Create'}
+            </CButton>{' '}
+            &nbsp;
+            <CButton
+              color="success"
+              type="reset"
+              style={{ color: 'white' }}
+              onClick={() => handleReset()}
+            >
+              Reset
             </CButton>
           </CCol>
         </CCard>
