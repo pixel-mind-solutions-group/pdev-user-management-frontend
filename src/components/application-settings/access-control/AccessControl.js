@@ -28,7 +28,7 @@ import { getAllUserRolesByScope } from '../../../service/user-role/UserRoleServi
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
 import { getByUUID as getModulesByUUID } from '../../../service/module/ModuleService'
 import { getComponentsByScopeAndModules as getAllComponentsByScopeAndModules } from '../../../service/component/ComponentService'
-import { number } from 'prop-types'
+import { comment } from 'postcss'
 
 function AccessControl() {
   const [userRoles, setUserRoles] = useState([])
@@ -51,8 +51,8 @@ function AccessControl() {
   }, [selectedModules])
 
   useEffect(() => {
-    console.log(components)
-  }, [components])
+    console.log(selectedComponents)
+  }, [selectedComponents])
 
   const [validated, setValidated] = useState(false)
   const handleSubmit = (event) => {
@@ -342,22 +342,38 @@ function AccessControl() {
               <CAccordionHeader>Components</CAccordionHeader>
               <CAccordionBody>
                 <CCard className="mb-4">
-                  <CCardHeader>
-                    <span>Job Position Module</span>
-                  </CCardHeader>
-                  <CCardBody>
-                    <CCol sm={6}>
-                      <CInputGroup>
-                        <CFormCheck
-                          type="checkbox"
-                          id="autoSizingCheck2"
-                          label="checkbox2"
-                          style={{ cursor: 'pointer' }}
-                        />{' '}
-                        &nbsp;&nbsp;&nbsp;
-                      </CInputGroup>
-                    </CCol>
-                  </CCardBody>
+                  {Array.from(components.entries()).map(([module, components], index) => {
+                    return (
+                      <React.Fragment key={index}>
+                        <CCard>
+                          <CCardHeader>
+                            <span>{module.module}</span>
+                          </CCardHeader>
+                          <CCardBody>
+                            <CCol sm={14}>
+                              <CInputGroup>
+                                {components.map((c) => {
+                                  return (
+                                    <React.Fragment key={c.component}>
+                                      <div style={{ cursor: 'pointer', marginRight: '2rem' }}>
+                                        <CFormCheck
+                                          type="checkbox"
+                                          id={`component_` + c.component}
+                                          label={c.key}
+                                          style={{ cursor: 'pointer' }}
+                                          onChange={(e) => handleComponentCheck(e)}
+                                        />
+                                      </div>
+                                    </React.Fragment>
+                                  )
+                                })}
+                              </CInputGroup>
+                            </CCol>
+                          </CCardBody>
+                        </CCard>
+                      </React.Fragment>
+                    )
+                  })}
                 </CCard>
               </CAccordionBody>
             </CAccordionItem>
