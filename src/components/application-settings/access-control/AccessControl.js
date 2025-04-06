@@ -226,6 +226,23 @@ function AccessControl() {
     })
   }
 
+  const handleComponentElementCheck = (e) => {
+    const elementId = e.target.id.replace('element_', '')
+    setSelectedComponentElements((prevData) => {
+      const updatedArr = [...prevData]
+      const isAlreadySelected = updatedArr.includes(elementId)
+
+      if (isAlreadySelected) {
+        // If it's already selected, remove it (uncheck)
+        return updatedArr.filter((id) => id !== elementId)
+      } else {
+        // Otherwise, add it to the array (check)
+        updatedArr.push(elementId)
+        return updatedArr
+      }
+    })
+  }
+
   const handleLoadComponentElementsByCheckedComponents = async () => {
     if (selectedComponents.length === 0) {
       return
@@ -235,10 +252,9 @@ function AccessControl() {
     try {
       const data = await getAllComponentElementsByScopeAndComponents(scope, components)
       if (data.data.status === 'OK') {
-        console.log(data.data.data)
         var mapObj = new Map()
         data.data.data.forEach((data) => {
-          mapObj.set(data.component, data.componentElements)
+          mapObj.set(data.component, data.elements)
         })
         setComponentElements(mapObj)
       } else {
@@ -393,22 +409,41 @@ function AccessControl() {
               <CAccordionHeader>Component Elements</CAccordionHeader>
               <CAccordionBody>
                 <CCard className="mb-4">
-                  <CCardHeader>
-                    <span>Job Position Component</span>
-                  </CCardHeader>
-                  <CCardBody>
-                    <CCol sm={6}>
-                      <CInputGroup>
-                        <CFormCheck
-                          type="checkbox"
-                          id="autoSizingCheck2"
-                          label="checkbox2"
-                          style={{ cursor: 'pointer' }}
-                        />{' '}
-                        &nbsp;&nbsp;&nbsp;
-                      </CInputGroup>
-                    </CCol>
-                  </CCardBody>
+                  {Array.from(componentElements.entries()).map(([component, elements], index) => {
+                    return (
+                      <React.Fragment key={index}>
+                        <CCard>
+                          <CCardHeader>
+                            <span>{component.name}</span>
+                          </CCardHeader>
+                          <CCardBody>
+                            <CCol sm={14}>
+                              <CInputGroup>
+                                {elements.map((c) => {
+                                  return (
+                                    <React.Fragment key={c.componentElementId}>
+                                      <div style={{ cursor: 'pointer', marginRight: '3rem' }}>
+                                        <CFormCheck
+                                          type="checkbox"
+                                          id={`element_` + c.componentElementId}
+                                          label={c.key}
+                                          style={{ cursor: 'pointer' }}
+                                          onChange={(e) => handleComponentElementCheck(e)}
+                                          checked={selectedComponentElements.includes(
+                                            c.componentElementId.toString(),
+                                          )}
+                                        />
+                                      </div>
+                                    </React.Fragment>
+                                  )
+                                })}
+                              </CInputGroup>
+                            </CCol>
+                          </CCardBody>
+                        </CCard>
+                      </React.Fragment>
+                    )
+                  })}
                 </CCard>
               </CAccordionBody>
             </CAccordionItem>
