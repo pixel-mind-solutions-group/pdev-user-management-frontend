@@ -41,6 +41,7 @@ function AccessControl() {
   const [selectedComponents, setSelectedComponents] = useState([])
   const [componentElements, setComponentElements] = useState(new Map())
   const [selectedComponentElements, setSelectedComponentElements] = useState([])
+  const [moduleAllCheck, setModuleAllCheck] = useState(false)
 
   useEffect(() => {
     getApplicationScopes()
@@ -343,6 +344,13 @@ function AccessControl() {
               <CAccordionBody>
                 <CCol sm={14}>
                   <CInputGroup>
+                    {/* <div style={{ cursor: 'pointer', marginRight: '1rem' }}>
+                      <CFormCheck
+                        type="checkbox"
+                        label="All"
+                        style={{ cursor: 'pointer', marginRight: '0.2rem' }}
+                      />{' '}
+                    </div> */}
                     {modules.map((m) => (
                       <React.Fragment key={m.id}>
                         <div style={{ cursor: 'pointer', marginRight: '1rem' }}>
