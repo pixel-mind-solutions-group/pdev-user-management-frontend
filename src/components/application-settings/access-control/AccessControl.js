@@ -26,13 +26,33 @@ import {
 import Swal from 'sweetalert2'
 import { getAllUserRolesByScope } from '../../../service/user-role/UserRoleService'
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
+import { getByUUID as getModulesByUUID } from '../../../service/module/ModuleService'
+import { getComponentsByScopeAndModules as getAllComponentsByScopeAndModules } from '../../../service/component/ComponentService'
+import { number } from 'prop-types'
 
 function AccessControl() {
   const [userRoles, setUserRoles] = useState([])
   const [scopes, setScopes] = useState([])
+
+  // Modules, Components, Component Elements
+  const [modules, setModules] = useState([])
+  const [selectedModules, setSelectedModules] = useState([])
+  const [components, setComponents] = useState(new Map())
+  const [selectedComponents, setSelectedComponents] = useState([])
+  const [componentElements, setComponentElements] = useState(new Map())
+  const [selectedComponentElements, setSelectedComponentElements] = useState([])
+
   useEffect(() => {
     getApplicationScopes()
   }, [])
+
+  useEffect(() => {
+    handleLoadComponentsByCheckedModules()
+  }, [selectedModules])
+
+  useEffect(() => {
+    console.log(components)
+  }, [components])
 
   const [validated, setValidated] = useState(false)
   const handleSubmit = (event) => {
@@ -60,7 +80,6 @@ function AccessControl() {
         setUserRoles([])
         return
       }
-      console.log('uuid', uuid)
       const data = await getAllUserRolesByScope(uuid)
       if (data.data.status === 'OK') {
         setUserRoles(data.data.data)
@@ -106,6 +125,107 @@ function AccessControl() {
     }
   }
 
+  const getAllModulesByUUID = async (e) => {
+    try {
+      const uuid = e.target.value
+      if (uuid === '-1') {
+        return
+      }
+      setModules([])
+      setSelectedModules([])
+      setComponents(new Map())
+      setSelectedComponents([])
+      setComponentElements(new Map())
+      setSelectedComponentElements([])
+
+      const data = await getModulesByUUID(uuid)
+      if (data.data.status === 'OK') {
+        setModules(data.data.data)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while calling user service to fetch modules by scope. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Modules fetching failed.',
+      })
+    }
+  }
+
+  const handleModuleCheck = (e) => {
+    const moduleId = e.target.id.replace('module_', '')
+    setSelectedModules((prevData) => {
+      const updatedArr = [...prevData]
+      const isAlreadySelected = updatedArr.includes(moduleId)
+
+      if (isAlreadySelected) {
+        // If it's already selected, remove it (uncheck)
+        return updatedArr.filter((id) => id !== moduleId)
+      } else {
+        // Otherwise, add it to the array (check)
+        updatedArr.push(moduleId)
+        return updatedArr
+      }
+    })
+  }
+
+  const handleLoadComponentsByCheckedModules = async () => {
+    if (selectedModules.length === 0) {
+      return
+    }
+    const scope = document.getElementById('appScope').value
+    const modules = selectedModules
+    try {
+      const data = await getAllComponentsByScopeAndModules(scope, modules)
+      if (data.data.status === 'OK') {
+        var mapObj = new Map()
+        data.data.data.forEach((data) => {
+          mapObj.set(data.module, data.components)
+        })
+        setComponents(mapObj)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error(
+        'Error occuring while calling user service to fetch components by scope and modules. ',
+        error,
+      )
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Components fetching failed.',
+      })
+    }
+  }
+
+  const handleComponentCheck = (e) => {
+    const componentId = e.target.id.replace('component_', '')
+    setSelectedComponents((prevData) => {
+      const updatedArr = [...prevData]
+      const isAlreadySelected = updatedArr.includes(componentId)
+
+      if (isAlreadySelected) {
+        // If it's already selected, remove it (uncheck)
+        return updatedArr.filter((id) => id !== componentId)
+      } else {
+        // Otherwise, add it to the array (check)
+        updatedArr.push(componentId)
+        return updatedArr
+      }
+    })
+  }
+
   /* 
           const [modules, setModules] = useState([]) -> array of modules ids  -> ex: 1, 2, 3, 4...
   
@@ -149,11 +269,12 @@ function AccessControl() {
               <CCol sm={4}>
                 <CFormLabel htmlFor="specificSizeSelect">Application Scope</CFormLabel>
                 <CFormSelect
-                  id="specificSizeSelect"
+                  id="appScope"
                   style={{ cursor: 'pointer' }}
                   required
                   onChange={() => {
                     getUserRolesByScope(event)
+                    getAllModulesByUUID(event)
                   }}
                 >
                   <option value="-1">Select an application scope</option>
@@ -171,7 +292,7 @@ function AccessControl() {
               </CCol>
               <CCol sm={4}>
                 <CFormLabel htmlFor="specificSizeSelect">User Role</CFormLabel>
-                <CFormSelect id="specificSizeSelect" style={{ cursor: 'pointer' }} required>
+                <CFormSelect id="userRole" style={{ cursor: 'pointer' }} required>
                   <option value="-1">Select a user role</option>
                   {userRoles.map((role, index) => {
                     return (
@@ -195,15 +316,24 @@ function AccessControl() {
             <CAccordionItem itemKey={1}>
               <CAccordionHeader>Modules</CAccordionHeader>
               <CAccordionBody>
-                <CCol sm={6}>
+                <CCol sm={14}>
                   <CInputGroup>
-                    <CFormCheck
-                      type="checkbox"
-                      id="autoSizingCheck2"
-                      label="checkbox1"
-                      style={{ cursor: 'pointer' }}
-                    />{' '}
-                    &nbsp;&nbsp;&nbsp;
+                    {modules.map((m) => (
+                      <React.Fragment key={m.id}>
+                        <div style={{ cursor: 'pointer', marginRight: '1rem' }}>
+                          <CFormCheck
+                            type="checkbox"
+                            id={`module_` + m.id}
+                            label={m.key}
+                            style={{ cursor: 'pointer', marginRight: '0.2rem' }}
+                            onChange={(e) => {
+                              handleModuleCheck(e)
+                            }}
+                            checked={selectedModules.includes(m.id.toString())}
+                          />{' '}
+                        </div>
+                      </React.Fragment>
+                    ))}
                   </CInputGroup>
                 </CCol>
               </CAccordionBody>
