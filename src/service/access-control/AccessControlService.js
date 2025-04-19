@@ -32,3 +32,16 @@ export const getAllWithPagination = (currentPage, size) => {
     throw error
   }
 }
+
+export const getById = (id) => {
+  try {
+    const response = api.get(`/get-by-id`, {
+      params: {
+        id: id,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}

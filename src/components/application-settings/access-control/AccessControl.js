@@ -33,6 +33,7 @@ import { getComponentElementsByScopeAndComponents as getAllComponentElementsBySc
 import {
   createOrUpdate,
   getAllWithPagination,
+  getById,
 } from '../../../service/access-control/AccessControlService'
 
 function AccessControl() {
@@ -348,6 +349,38 @@ function AccessControl() {
     }
   }
 
+  const handleEditAccessControlByUserRoleId = async (id) => {
+    try {
+      const data = await getById(id)
+      if (data.data.status === 'OK') {
+        setModules(data.data.data.moduleResponses)
+        setSelectedModules(data.data.data.moduleResponses.map((m) => m.id))
+
+        var mapObj = new Map()
+        data.data.data.componentsByModules.forEach((data) => {
+          mapObj.set(data.module, data.components)
+        })
+        setComponents(mapObj)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error(
+        'Error occuring while calling user service to fetch access controls by user role id. ',
+        error,
+      )
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Access controls fetching failed.',
+      })
+    }
+  }
+
   const handleReset = () => {
     // setEditable(false)
     // setModules([])
@@ -581,7 +614,12 @@ function AccessControl() {
                   <CTableDataCell>{c.applicationScope}</CTableDataCell>
                   <CTableDataCell>
                     <CButton type="button" className="btn btn-primary btn-sm">
-                      <span style={{ color: 'white' }}>Edit</span>
+                      <span
+                        style={{ color: 'white' }}
+                        onClick={() => handleEditAccessControlByUserRoleId(c.userRoleId)}
+                      >
+                        Edit
+                      </span>
                     </CButton>{' '}
                     &nbsp;
                     <CButton type="button" className="btn btn-danger btn-sm">
