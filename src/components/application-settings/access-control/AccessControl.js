@@ -361,6 +361,22 @@ function AccessControl() {
           mapObj.set(data.module, data.components)
         })
         setComponents(mapObj)
+        setSelectedComponents(
+          data.data.data.componentsByModules.map((c) => {
+            c.components.map((cobj) => cobj.component)
+          }),
+        )
+
+        var mapElementObj = new Map()
+        data.data.data.componentElementsByComponents.forEach((data) => {
+          mapElementObj.set(data.component, data.elements)
+        })
+        setComponentElements(mapElementObj)
+        setSelectedComponentElements(
+          data.data.data.componentElementsByComponents.map((ce) => {
+            ce.elements.map((ceobj) => ceobj.componentElementId)
+          }),
+        )
       } else {
         Swal.fire({
           icon: 'error',
