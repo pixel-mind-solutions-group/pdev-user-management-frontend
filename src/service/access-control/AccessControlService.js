@@ -18,3 +18,17 @@ export const createOrUpdate = async (data) => {
     throw error
   }
 }
+
+export const getAllWithPagination = (currentPage, size) => {
+  try {
+    const response = api.get(`/get-all-page`, {
+      params: {
+        page: currentPage,
+        size: size,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}

@@ -24,16 +24,26 @@ import {
   CInputGroup,
 } from '@coreui/react'
 import Swal from 'sweetalert2'
+import Pagination from '../../UI/pagination/Pagination'
 import { getAllUserRolesByScope } from '../../../service/user-role/UserRoleService'
 import { getAll as getAllAppScopes } from '../../../service/application-scope/ApplicationScopeService'
 import { getByUUID as getModulesByUUID } from '../../../service/module/ModuleService'
 import { getComponentsByScopeAndModules as getAllComponentsByScopeAndModules } from '../../../service/component/ComponentService'
 import { getComponentElementsByScopeAndComponents as getAllComponentElementsByScopeAndComponents } from '../../../service/component-element/ComponentElementService'
-import { createOrUpdate } from '../../../service/access-control/AccessControlService'
+import {
+  createOrUpdate,
+  getAllWithPagination,
+} from '../../../service/access-control/AccessControlService'
 
 function AccessControl() {
   const [userRoles, setUserRoles] = useState([])
   const [scopes, setScopes] = useState([])
+
+  // page response
+  const [totalPages, setTotalPages] = useState()
+  const [currentPage, setCurrentPage] = useState(0)
+  const [accessControls, setAccessControls] = useState([])
+  const pageSize = 10
 
   // Modules, Components, Component Elements
   const [modules, setModules] = useState([])
@@ -63,6 +73,10 @@ function AccessControl() {
   useEffect(() => {
     handleLoadComponentElementsByCheckedComponents()
   }, [selectedComponents])
+
+  useEffect(() => {
+    getAllModules(currentPage, pageSize)
+  }, [currentPage])
 
   const getUserRolesByScope = async (e) => {
     try {
@@ -287,6 +301,7 @@ function AccessControl() {
             title: 'Success',
             text: data.data.message,
           })
+          getAllModules(currentPage, pageSize)
           handleReset()
         } else {
           Swal.fire({
@@ -306,14 +321,41 @@ function AccessControl() {
     }
   }
 
+  const getAllModules = async (currentPage, pageSize) => {
+    try {
+      const data = await getAllWithPagination(currentPage, pageSize)
+      if (data.data.status == 'OK') {
+        setAccessControls(data.data.data.dataList)
+        setTotalPages(data.data.data.totalPages)
+        setCurrentPage(data.data.data.currentPage)
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.data.message,
+        })
+      }
+    } catch (error) {
+      console.error(
+        'Error occuring while calling user service to fetch all access controls. ',
+        error,
+      )
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Access controls fetching failed.',
+      })
+    }
+  }
+
   const handleReset = () => {
-    setEditable(false)
-    setModules([])
-    setSelectedModules([])
-    setComponents(new Map())
-    setSelectedComponents([])
-    setComponentElements(new Map())
-    setSelectedComponentElements([])
+    // setEditable(false)
+    // setModules([])
+    // setSelectedModules([])
+    // setComponents(new Map())
+    // setSelectedComponents([])
+    // setComponentElements(new Map())
+    // setSelectedComponentElements([])
   }
 
   return (
@@ -524,21 +566,38 @@ function AccessControl() {
         <CTable>
           <CTableHead color="dark">
             <CTableRow>
+              <CTableHeaderCell scope="col">No</CTableHeaderCell>
               <CTableHeaderCell scope="col">Role</CTableHeaderCell>
               <CTableHeaderCell scope="col">Application Scope</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Status</CTableHeaderCell>
               <CTableHeaderCell scope="col">Action</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            <CTableRow>
-              <CTableDataCell>Mark</CTableDataCell>
-              <CTableDataCell>Otto</CTableDataCell>
-              <CTableDataCell>@mdo</CTableDataCell>
-              <CTableDataCell>Mark</CTableDataCell>
-            </CTableRow>
+            {accessControls.map((c, index) => (
+              <React.Fragment key={index}>
+                <CTableRow>
+                  <CTableDataCell>{index + 1}</CTableDataCell>
+                  <CTableDataCell>{c.userRole}</CTableDataCell>
+                  <CTableDataCell>{c.applicationScope}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton type="button" className="btn btn-primary btn-sm">
+                      <span style={{ color: 'white' }}>Edit</span>
+                    </CButton>{' '}
+                    &nbsp;
+                    <CButton type="button" className="btn btn-danger btn-sm">
+                      <span style={{ color: 'white' }}>Delete</span>
+                    </CButton>{' '}
+                  </CTableDataCell>
+                </CTableRow>
+              </React.Fragment>
+            ))}
           </CTableBody>
         </CTable>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </CCol>
     </CRow>
   )
