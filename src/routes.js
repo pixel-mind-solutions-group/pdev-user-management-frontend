@@ -8,6 +8,7 @@ import UserRole from './components/user-role/UserRole'
 import AccessControl from './components/application-settings/access-control/AccessControl'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
+const Login = React.lazy(() => import('./views/pages/login/Login'))
 
 const ApplicationScope = React.lazy(
   () => import('./components/application-settings/application-scope/ApplicationScope'),
@@ -17,6 +18,7 @@ const User = React.lazy(() => import('./components/user/User'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
+  { path: '/login', name: 'Login', element: Login },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/main/user', name: 'Users', element: User },
   { path: '/application/scope', name: 'Application Scope', element: ApplicationScope },
