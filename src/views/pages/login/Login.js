@@ -11,7 +11,7 @@ const Login = () => {
           <div className={`col-lg-12 ${styles['login-key']}`}>
             <i className="fa fa-key" aria-hidden="true"></i>
           </div>
-          <div className={`col-lg-12 ${styles['login-title']}`}>IAM PANEL</div>
+          <div className={`col-lg-12 ${styles['login-title']}`}>PIXEL IAM PANEL</div>
 
           <div className={`col-lg-12 ${styles['login-form']}`}>
             <div className={`col-lg-12 ${styles['login-form']}`}>

@@ -1,5 +1,8 @@
-body {
-    background: #222D32;
+.container {
+    justify-content: center;
+    align-items: center;
+    height: 98vh;
+    background-color: #222d32;
     font-family: 'Roboto', sans-serif;
 }
 
@@ -32,6 +35,8 @@ body {
 
 .login-form {
     margin-top: 25px;
+    padding-left: 25px;
+    padding-right: 25px;
     text-align: left;
 }
 
@@ -124,4 +129,10 @@ label {
 
 .loginbttm {
     padding: 0px;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    background-color: inherit;
+    box-shadow: none;
 }
