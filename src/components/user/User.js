@@ -21,7 +21,11 @@ import {
   CTableDataCell,
   CTableRow,
 } from '@coreui/react'
-import { getAllWithPagination, createOrUpdate } from '../../service/user/UserService'
+import {
+  getAllWithPagination,
+  createOrUpdate,
+  editUserAccount,
+} from '../../service/user/UserService'
 import { getAll as getAllApplicationScopes } from '../../service/application-scope/ApplicationScopeService'
 import { getAllUserRolesByScope } from '../../service/user-role/UserRoleService'
 import { getAllAuthParties } from '../../service/permission/auth-party/AuthPartyService'
@@ -75,6 +79,7 @@ const User = () => {
       userHasAuthorizePartyIds: selectedParties,
       userHasApplicationScopeHasUserRoles: selectedRolesAndScopes,
     }))
+    console.log(formData)
   }, [emailVerified, isLocked, selectedParties, selectedRolesAndScopes])
 
   const loadUsersPage = async () => {
@@ -199,7 +204,7 @@ const User = () => {
 
   const removeSelectedRoleAndAppScope = (id) => {
     setSelectedRolesAndScopes((prevRolesAndScopes) => {
-      return prevRolesAndScopes.filter((obj) => obj.roleId !== id)
+      return prevRolesAndScopes.filter((obj) => obj.userRoleId !== id)
     })
   }
 
@@ -211,6 +216,8 @@ const User = () => {
       setValidated(true)
     } else {
       try {
+        console.log('Creating...')
+        console.log(formData)
         const data = await createOrUpdate(formData)
         if (data.status == 'OK') {
           Swal.fire({
@@ -245,6 +252,47 @@ const User = () => {
     }))
   }
 
+  const handleEditUserAccount = async (id) => {
+    try {
+      const data = await editUserAccount(id)
+      if (data.data.status == 'OK') {
+        setSelectedRolesAndScopes([])
+        setSelectedParties([])
+
+        setEmailVerified(data.data.data.isEmailVerified)
+        setIsLocked(data.data.data.isLocked)
+        setFormData((prevData) => ({
+          ...prevData,
+          email: data.data.data.email,
+          firstName: data.data.data.firstName,
+          lastName: data.data.data.lastName,
+          userName: data.data.data.userName,
+          status: data.data.data.status,
+        }))
+
+        setSelectedParties(data.data.data.userAuthParties.map((r) => r.toString()))
+        data.data.data.userHasApplicationScopeHasUserRoles.map((r) => {
+          setSelectedRolesAndScopes((prevRolesAndScopes) => {
+            const obj = {
+              userRoleId: r.userRole?.userRoleId,
+              scopeUUID: r.userRole?.applicationScope?.uniqueId,
+              roleName: r.userRole?.role,
+              scopeName: r.userRole?.applicationScope?.scope,
+            }
+            return [...prevRolesAndScopes, obj]
+          })
+        })
+      }
+    } catch (error) {
+      console.error('Error occuring while editing user account. ', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'User account editing failed.',
+      })
+    }
+  }
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -263,6 +311,7 @@ const User = () => {
                 <CFormLabel htmlFor="specificSizeInputName">First Name</CFormLabel>
                 <CFormInput
                   id="firstName"
+                  value={formData.firstName}
                   placeholder="First Name"
                   required
                   onChange={(e) => handleFormChange(e)}
@@ -276,6 +325,7 @@ const User = () => {
                 <CInputGroup>
                   <CFormInput
                     id="lastName"
+                    value={formData.lastName}
                     placeholder="Last Name"
                     required
                     onChange={(e) => handleFormChange(e)}
@@ -291,6 +341,7 @@ const User = () => {
                   <CInputGroupText>@</CInputGroupText>
                   <CFormInput
                     id="userName"
+                    value={formData.userName}
                     placeholder="User Name"
                     required
                     onChange={(e) => handleFormChange(e)}
@@ -307,7 +358,6 @@ const User = () => {
                     type="password"
                     id="password"
                     placeholder="Password"
-                    required
                     onChange={(e) => handleFormChange(e)}
                   />
                   <CFormFeedback tooltip invalid>
@@ -320,6 +370,7 @@ const User = () => {
                 <CInputGroup>
                   <CFormInput
                     id="email"
+                    value={formData.email}
                     placeholder="Email"
                     required
                     onChange={(e) => handleFormChange(e)}
@@ -333,6 +384,7 @@ const User = () => {
                 <CFormLabel htmlFor="specificSizeSelect">Status</CFormLabel>
                 <CFormSelect
                   id="status"
+                  value={formData.status}
                   style={{ cursor: 'pointer' }}
                   required
                   onChange={(e) => handleFormChange(e)}
@@ -546,7 +598,11 @@ const User = () => {
                   <CTableDataCell>{user.accountNonLocked ? 'Non-locked' : 'Locked'}</CTableDataCell>
                   <CTableDataCell>{user.status}</CTableDataCell>
                   <CTableDataCell>
-                    <CButton type="button" className="btn btn-primary btn-sm">
+                    <CButton
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => handleEditUserAccount(user.idUser)}
+                    >
                       <span style={{ color: 'white' }}>Edit</span>
                     </CButton>{' '}
                     &nbsp;

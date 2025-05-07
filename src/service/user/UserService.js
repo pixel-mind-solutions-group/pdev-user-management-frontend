@@ -17,6 +17,19 @@ export const getAllWithPagination = (currentPage, size) => {
   }
 }
 
+export const editUserAccount = (id) => {
+  try {
+    const response = axios.get(`${USER_API_URL}/get-by-id`, {
+      params: {
+        userId: id,
+      },
+    })
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
 export const createOrUpdate = async (data) => {
   try {
     const response = await fetch(`${USER_API_URL}/ad/create-or-modify`, {
