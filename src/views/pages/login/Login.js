@@ -1,8 +1,15 @@
 import React from 'react'
 import styles from './login.module.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
+  const navigate = useNavigate() // Initialize useNavigate
+
+  const handleLogin = (e) => {
+    e.preventDefault() // Prevent the default form submission
+    navigate('/dashboard')
+  }
   return (
     <div className={styles.container}>
       <div className="row">
@@ -15,7 +22,7 @@ const Login = () => {
 
           <div className={`col-lg-12 ${styles['login-form']}`}>
             <div className={`col-lg-12 ${styles['login-form']}`}>
-              <form>
+              <form onSubmit={handleLogin}>
                 <div className={styles['form-group']}>
                   <label className={styles['form-control-label']}>USERNAME</label>
                   <input type="text" className="form-control" />
